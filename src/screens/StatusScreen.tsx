@@ -1,14 +1,9 @@
 import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,
-    TouchableOpacity,
-    Image,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import Header from '../components/Header';
+import Avatar from '../components/Avatar';
+import FloatingButton from '../components/FloatingButton';
 
 // Mock status data
 const MOCK_STATUS = [
@@ -38,14 +33,12 @@ const MOCK_STATUS = [
 const StatusItem = ({ item }: { item: typeof MOCK_STATUS[0] }) => {
     return (
         <TouchableOpacity style={styles.statusItem}>
-            <View style={styles.avatarContainer}>
-                <Image source={{ uri: item.avatar }} style={styles.avatar} />
-                {item.isMyStatus && (
-                    <View style={styles.addButton}>
-                        <Icon name="add-circle" size={24} color={COLORS.primary} />
-                    </View>
-                )}
-            </View>
+            <Avatar
+                uri={item.avatar}
+                showBadge={item.isMyStatus}
+                badgeIcon="add-circle"
+                badgeColor={COLORS.primary}
+            />
             <View style={styles.statusInfo}>
                 <Text style={styles.name}>{item.name}</Text>
                 <Text style={styles.time}>{item.time}</Text>
@@ -57,19 +50,16 @@ const StatusItem = ({ item }: { item: typeof MOCK_STATUS[0] }) => {
 const StatusScreen = () => {
     return (
         <View style={styles.container}>
+            <Header title="Status" />
             <FlatList
                 data={MOCK_STATUS}
                 renderItem={({ item }) => <StatusItem item={item} />}
                 keyExtractor={item => item.id}
-                ListHeaderComponent={
-                    <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Status</Text>
-                    </View>
-                }
             />
-            <TouchableOpacity style={styles.cameraButton}>
-                <Icon name="camera" size={24} color={COLORS.white} />
-            </TouchableOpacity>
+            <FloatingButton
+                icon="camera"
+                onPress={() => console.log('Open camera')}
+            />
         </View>
     );
 };
@@ -79,16 +69,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
     },
-    header: {
-        padding: SIZES.base * 2,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.lightGray,
-    },
-    headerTitle: {
-        ...FONTS.medium,
-        fontSize: SIZES.large,
-        color: COLORS.text,
-    },
     statusItem: {
         flexDirection: 'row',
         padding: SIZES.base * 2,
@@ -96,24 +76,9 @@ const styles = StyleSheet.create({
         borderBottomColor: COLORS.lightGray,
         backgroundColor: COLORS.white,
     },
-    avatarContainer: {
-        position: 'relative',
-        marginRight: SIZES.base * 2,
-    },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-    },
-    addButton: {
-        position: 'absolute',
-        bottom: -5,
-        right: -5,
-        backgroundColor: COLORS.white,
-        borderRadius: 12,
-    },
     statusInfo: {
         justifyContent: 'center',
+        marginLeft: SIZES.base * 2,
     },
     name: {
         ...FONTS.medium,
@@ -125,18 +90,6 @@ const styles = StyleSheet.create({
         ...FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
-    },
-    cameraButton: {
-        position: 'absolute',
-        bottom: SIZES.base * 3,
-        right: SIZES.base * 3,
-        backgroundColor: COLORS.primary,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        justifyContent: 'center',
-        alignItems: 'center',
-        ...SHADOWS.medium,
     },
 });
 

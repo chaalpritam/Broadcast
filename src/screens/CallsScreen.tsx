@@ -1,14 +1,10 @@
 import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,
-    TouchableOpacity,
-    Image,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import Header from '../components/Header';
+import Avatar from '../components/Avatar';
+import FloatingButton from '../components/FloatingButton';
 
 // Mock calls data
 const MOCK_CALLS = [
@@ -59,7 +55,7 @@ const CallItem = ({ item }: { item: typeof MOCK_CALLS[0] }) => {
 
     return (
         <TouchableOpacity style={styles.callItem}>
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            <Avatar uri={item.avatar} />
             <View style={styles.callInfo}>
                 <Text style={styles.name}>{item.name}</Text>
                 <View style={styles.callDetails}>
@@ -88,19 +84,16 @@ const CallItem = ({ item }: { item: typeof MOCK_CALLS[0] }) => {
 const CallsScreen = () => {
     return (
         <View style={styles.container}>
+            <Header title="Calls" />
             <FlatList
                 data={MOCK_CALLS}
                 renderItem={({ item }) => <CallItem item={item} />}
                 keyExtractor={item => item.id}
-                ListHeaderComponent={
-                    <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Calls</Text>
-                    </View>
-                }
             />
-            <TouchableOpacity style={styles.newCallButton}>
-                <Icon name="call" size={24} color={COLORS.white} />
-            </TouchableOpacity>
+            <FloatingButton
+                icon="call"
+                onPress={() => console.log('New call')}
+            />
         </View>
     );
 };
@@ -110,16 +103,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
     },
-    header: {
-        padding: SIZES.base * 2,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.lightGray,
-    },
-    headerTitle: {
-        ...FONTS.medium,
-        fontSize: SIZES.large,
-        color: COLORS.text,
-    },
     callItem: {
         flexDirection: 'row',
         padding: SIZES.base * 2,
@@ -128,15 +111,10 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         alignItems: 'center',
     },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        marginRight: SIZES.base * 2,
-    },
     callInfo: {
         flex: 1,
         justifyContent: 'center',
+        marginLeft: SIZES.base * 2,
     },
     name: {
         ...FONTS.medium,
@@ -157,18 +135,6 @@ const styles = StyleSheet.create({
     },
     callButton: {
         padding: SIZES.base,
-    },
-    newCallButton: {
-        position: 'absolute',
-        bottom: SIZES.base * 3,
-        right: SIZES.base * 3,
-        backgroundColor: COLORS.primary,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        justifyContent: 'center',
-        alignItems: 'center',
-        ...SHADOWS.medium,
     },
 });
 
