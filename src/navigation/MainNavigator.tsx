@@ -1,0 +1,106 @@
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { COLORS } from '../constants/theme';
+import { MainTabParamList, RootStackParamList } from './types';
+
+// Import screens (we'll create these next)
+import ChatsScreen from '../screens/ChatsScreen';
+import StatusScreen from '../screens/StatusScreen';
+import CallsScreen from '../screens/CallsScreen';
+import CameraScreen from '../screens/CameraScreen';
+import ChatScreen from '../screens/ChatScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+
+const Tab = createBottomTabNavigator<MainTabParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const MainTabs = () => {
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                tabBarStyle: {
+                    backgroundColor: COLORS.background,
+                    borderTopWidth: 0,
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    height: 60,
+                    paddingBottom: 10,
+                },
+                tabBarActiveTintColor: COLORS.primary,
+                tabBarInactiveTintColor: COLORS.gray,
+                headerStyle: {
+                    backgroundColor: COLORS.primary,
+                },
+                headerTintColor: COLORS.white,
+                headerTitleStyle: {
+                    fontWeight: 'bold',
+                },
+            }}>
+            <Tab.Screen
+                name="Chats"
+                component={ChatsScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Icon name="chatbubbles-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Status"
+                component={StatusScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Icon name="camera-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Calls"
+                component={CallsScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Icon name="call-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Camera"
+                component={CameraScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Icon name="camera" size={size} color={color} />
+                    ),
+                }}
+            />
+        </Tab.Navigator>
+    );
+};
+
+const MainNavigator = () => {
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: COLORS.primary,
+                },
+                headerTintColor: COLORS.white,
+                headerTitleStyle: {
+                    fontWeight: 'bold',
+                },
+            }}>
+            <Stack.Screen
+                name="Main"
+                component={MainTabs}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+        </Stack.Navigator>
+    );
+};
+
+export default MainNavigator; 
