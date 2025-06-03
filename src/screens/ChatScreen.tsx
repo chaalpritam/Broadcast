@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     Platform,
+    ActivityIndicator,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
@@ -16,49 +17,79 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import type { RootStackParamList } from '../navigation/types';
 import Header from '../components/Header';
 import MessageBubble from '../components/MessageBubble';
+import { useAppSelector, useAppDispatch } from '../hooks';
+import {
+    setActiveChat,
+    addMessage,
+    markChatAsRead,
+    setMessages,
+} from '../store/slices/chatsSlice';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'Chat'>;
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-// Mock messages data
-const MOCK_MESSAGES = [
-    {
-        id: '1',
-        text: 'Hey, how are you?',
-        time: '10:30 AM',
-        isSent: true,
-    },
-    {
-        id: '2',
-        text: 'I'm good, thanks! How about you?',
-    time: '10:31 AM',
-        isSent: false,
-    },
-    {
-        id: '3',
-        text: 'Doing great! Just working on this new app.',
-        time: '10:32 AM',
-        isSent: true,
-    },
-];
-
 const ChatScreen = () => {
     const route = useRoute<ChatScreenRouteProp>();
     const navigation = useNavigation<NavigationProp>();
+    const dispatch = useAppDispatch();
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState(MOCK_MESSAGES);
+
+    // Get chat data from Redux store
+    const { activeChat, messages, isLoading, error } = useAppSelector(state => state.chats);
+    const currentUser = useAppSelector(state => state.auth.user);
+    const chatMessages = messages[route.params.chatId] || [];
+    const chat = useAppSelector(state =>
+        state.chats.chats.find(c => c.id === route.params.chatId)
+    );
+
+    useEffect(() => {
+        // Set active chat when component mounts
+        dispatch(setActiveChat(route.params.chatId));
+
+        // Mark chat as read
+        dispatch(markChatAsRead(route.params.chatId));
+
+        // TODO: Load messages from API
+        // For now, we'll use mock data
+        const mockMessages = [
+            {
+                id: '1',
+                text: 'Hey, how are you?',
+                time: '10:30 AM',
+                isSent: true,
+                senderId: currentUser?.id || 'me',
+                chatId: route.params.chatId,
+            },
+            {
+                id: '2',
+                text: "I'm good, thanks! How about you?",
+                time: '10:31 AM',
+                isSent: false,
+                senderId: route.params.chatId,
+                chatId: route.params.chatId,
+            },
+        ];
+        dispatch(setMessages({ chatId: route.params.chatId, messages: mockMessages }));
+
+        return () => {
+            // Clear active chat when component unmounts
+            dispatch(setActiveChat(null));
+        };
+    }, [dispatch, route.params.chatId, currentUser?.id]);
 
     const sendMessage = () => {
-        if (message.trim().length === 0) return;
+        if (message.trim().length === 0 || !currentUser) return;
 
         const newMessage = {
             id: Date.now().toString(),
             text: message.trim(),
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isSent: true,
+            senderId: currentUser.id,
+            chatId: route.params.chatId,
         };
 
-        setMessages([...messages, newMessage]);
+        dispatch(addMessage(newMessage));
         setMessage('');
     };
 
@@ -77,18 +108,34 @@ const ChatScreen = () => {
         },
     ];
 
+    if (isLoading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        );
+    }
+
     return (
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
             <Header
-                title={route.params.name}
-                avatar="https://via.placeholder.com/40"
+                title={chat?.participants[0]?.name || route.params.name}
+                avatar={chat?.participants[0]?.avatar}
                 actions={headerActions}
             />
             <FlatList
-                data={messages}
+                data={chatMessages}
                 renderItem={({ item }) => (
                     <MessageBubble
                         message={item.text}
@@ -134,6 +181,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.background,
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.background,
+        padding: SIZES.base * 2,
+    },
+    errorText: {
+        ...FONTS.regular,
+        color: COLORS.error,
+        textAlign: 'center',
     },
     messagesList: {
         padding: SIZES.base * 2,

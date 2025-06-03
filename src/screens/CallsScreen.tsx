@@ -1,40 +1,22 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import Header from '../components/Header';
 import Avatar from '../components/Avatar';
 import FloatingButton from '../components/FloatingButton';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { setCalls } from '../store/slices/callsSlice';
+import type { Call } from '../types/models';
+import type { RootState } from '../store';
 
-// Mock calls data
-const MOCK_CALLS = [
-    {
-        id: '1',
-        name: 'John Doe',
-        time: 'Today, 10:30 AM',
-        avatar: 'https://via.placeholder.com/50',
-        type: 'outgoing',
-        callType: 'video',
-    },
-    {
-        id: '2',
-        name: 'Jane Smith',
-        time: 'Yesterday, 9:45 AM',
-        avatar: 'https://via.placeholder.com/50',
-        type: 'incoming',
-        callType: 'audio',
-    },
-    {
-        id: '3',
-        name: 'Mike Johnson',
-        time: 'Yesterday, 2:15 PM',
-        avatar: 'https://via.placeholder.com/50',
-        type: 'missed',
-        callType: 'video',
-    },
-];
+interface CallItemData extends Call {
+    name: string;
+    avatar: string;
+}
 
-const CallItem = ({ item }: { item: typeof MOCK_CALLS[0] }) => {
+const CallItem = ({ item, onPress }: { item: CallItemData; onPress: () => void }) => {
     const getCallIcon = () => {
         if (item.type === 'missed') {
             return item.callType === 'video' ? 'videocam-off' : 'call-off';
@@ -54,7 +36,7 @@ const CallItem = ({ item }: { item: typeof MOCK_CALLS[0] }) => {
     };
 
     return (
-        <TouchableOpacity style={styles.callItem}>
+        <TouchableOpacity style={styles.callItem} onPress={onPress}>
             <Avatar uri={item.avatar} />
             <View style={styles.callInfo}>
                 <Text style={styles.name}>{item.name}</Text>
@@ -82,12 +64,76 @@ const CallItem = ({ item }: { item: typeof MOCK_CALLS[0] }) => {
 };
 
 const CallsScreen = () => {
+    const dispatch = useAppDispatch();
+    const { calls, isLoading, error } = useAppSelector((state: RootState) => state.calls);
+
+    useEffect(() => {
+        // TODO: Load calls from API
+        // For now, we'll use mock data
+        const mockCalls: CallItemData[] = [
+            {
+                id: '1',
+                userId: '1',
+                name: 'John Doe',
+                time: 'Today, 10:30 AM',
+                avatar: 'https://via.placeholder.com/50',
+                type: 'outgoing',
+                callType: 'video',
+            },
+            {
+                id: '2',
+                userId: '2',
+                name: 'Jane Smith',
+                time: 'Yesterday, 9:45 AM',
+                avatar: 'https://via.placeholder.com/50',
+                type: 'incoming',
+                callType: 'audio',
+            },
+            {
+                id: '3',
+                userId: '3',
+                name: 'Mike Johnson',
+                time: 'Yesterday, 2:15 PM',
+                avatar: 'https://via.placeholder.com/50',
+                type: 'missed',
+                callType: 'video',
+            },
+        ];
+
+        dispatch(setCalls(mockCalls));
+    }, [dispatch]);
+
+    const handleCallPress = (call: CallItemData) => {
+        console.log('Call pressed:', call.id);
+    };
+
+    if (isLoading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <Header title="Calls" />
             <FlatList
-                data={MOCK_CALLS}
-                renderItem={({ item }) => <CallItem item={item} />}
+                data={calls as CallItemData[]}
+                renderItem={({ item }) => (
+                    <CallItem
+                        item={item}
+                        onPress={() => handleCallPress(item)}
+                    />
+                )}
                 keyExtractor={item => item.id}
             />
             <FloatingButton
@@ -102,6 +148,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.background,
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.background,
+        padding: SIZES.base * 2,
+    },
+    errorText: {
+        ...FONTS.regular,
+        color: COLORS.error,
+        textAlign: 'center',
     },
     callItem: {
         flexDirection: 'row',
