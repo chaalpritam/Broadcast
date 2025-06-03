@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../constants/theme';
 import { MainTabParamList, RootStackParamList } from './types';
 
-// Import screens (we'll create these next)
+// Import screens
 import ChatsScreen from '../screens/ChatsScreen';
 import StatusScreen from '../screens/StatusScreen';
 import CallsScreen from '../screens/CallsScreen';
@@ -13,6 +13,7 @@ import CameraScreen from '../screens/CameraScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import CommunityNavigator from './CommunityNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -73,6 +74,16 @@ const MainTabs = () => {
                     tabBarIcon: ({ color, size }) => (
                         <Icon name="camera" size={size} color={color} />
                     ),
+                }}
+            />
+            <Tab.Screen
+                name="Communities"
+                component={CommunityNavigator}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Icon name="people-outline" size={size} color={color} />
+                    ),
+                    headerShown: false,
                 }}
             />
         </Tab.Navigator>
