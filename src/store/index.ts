@@ -1,15 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
-import chatsReducer from './slices/chatsSlice';
-import callsReducer from './slices/callsSlice';
+import chatReducer from './slices/chatSlice';
 import statusReducer from './slices/statusSlice';
-import authReducer from './slices/authSlice';
+import callsReducer from './slices/callsSlice';
+import communityReducer from './slices/communitySlice';
 
 export const store = configureStore({
   reducer: {
-    chats: chatsReducer,
-    calls: callsReducer,
+    chat: chatReducer,
     status: statusReducer,
-    auth: authReducer,
+    calls: callsReducer,
+    community: communityReducer,
   },
 });
 
