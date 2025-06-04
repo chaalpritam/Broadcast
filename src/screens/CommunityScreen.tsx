@@ -1,131 +1,154 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     View,
     StyleSheet,
     FlatList,
     ActivityIndicator,
     RefreshControl,
-    TouchableOpacity,
+    Alert,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+    fetchCommunityPosts,
+    fetchPostComments,
+    togglePostLike,
+    setSelectedCommunity,
+} from '../store/slices/communitySlice';
+import {
+    selectCommunityById,
+    selectPostsByCommunityId,
+    selectPostsLoading,
+    selectPostsError,
+    selectCommentsLoading,
+} from '../store/selectors/communitySelectors';
+import { COLORS, SIZES } from '../constants/theme';
 import CommunityHeader from '../components/community/CommunityHeader';
 import CommunityPost from '../components/community/CommunityPost';
 import FloatingButton from '../components/FloatingButton';
-
-// Mock data - will be replaced with Redux state
-const mockCommunity = {
-    id: '1',
-    name: 'Tech Enthusiasts',
-    description: 'A community for discussing the latest in technology, programming, and innovation. Join us to share knowledge, ask questions, and connect with fellow tech enthusiasts.',
-    avatar: 'https://picsum.photos/200',
-    coverImage: 'https://picsum.photos/800/400',
-    memberCount: 1234,
-    isJoined: true,
-    role: 'member' as const,
-};
-
-const mockPosts = [
-    {
-        id: '1',
-        author: {
-            id: '101',
-            name: 'John Doe',
-            avatar: 'https://picsum.photos/201',
-            role: 'admin' as const,
-        },
-        content: 'Just released a new open-source project! Check it out and let me know what you think. #opensource #programming',
-        images: ['https://picsum.photos/400/300'],
-        likes: 42,
-        comments: 12,
-        timestamp: '2 hours ago',
-        isLiked: false,
-    },
-    {
-        id: '2',
-        author: {
-            id: '102',
-            name: 'Jane Smith',
-            avatar: 'https://picsum.photos/202',
-            role: 'member' as const,
-        },
-        content: 'What are your thoughts on the latest React Native update? I\'ve been testing it out and would love to hear your experiences.',
-        likes: 28,
-        comments: 15,
-        timestamp: '5 hours ago',
-        isLiked: true,
-    },
-];
+import EmptyState from '../components/EmptyState';
 
 const CommunityScreen = () => {
-    const route = useRoute();
     const navigation = useNavigation();
-    const [isLoading, setIsLoading] = useState(false);
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [posts, setPosts] = useState(mockPosts);
+    const route = useRoute();
+    const dispatch = useAppDispatch();
+    const { communityId } = route.params as { communityId: string };
+
+    const [refreshing, setRefreshing] = useState(false);
+    const [isJoining, setIsJoining] = useState(false);
+
+    const community = useAppSelector(state => selectCommunityById(state, communityId));
+    const posts = useAppSelector(state => selectPostsByCommunityId(state, communityId));
+    const isLoading = useAppSelector(selectPostsLoading);
+    const error = useAppSelector(selectPostsError);
+    const isLoadingComments = useAppSelector(selectCommentsLoading);
+
+    useEffect(() => {
+        dispatch(setSelectedCommunity(communityId));
+        loadCommunityData();
+    }, [communityId, dispatch]);
+
+    const loadCommunityData = useCallback(async () => {
+        await Promise.all([
+            dispatch(fetchCommunityPosts(communityId)),
+            // Load comments for each post
+            ...posts.map(post => dispatch(fetchPostComments({ postId: post.id, communityId })),
+        ]);
+    }, [dispatch, communityId, posts]);
 
     const handleRefresh = useCallback(async () => {
-        setIsRefreshing(true);
-        // TODO: Fetch fresh data from API
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 1000);
-    }, []);
+        setRefreshing(true);
+        await loadCommunityData();
+        setRefreshing(false);
+    }, [loadCommunityData]);
 
-    const handleJoinPress = useCallback(() => {
-        // TODO: Implement join community logic
-        console.log('Join community');
+    const handleJoinPress = useCallback(async () => {
+        setIsJoining(true);
+        try {
+            // TODO: Implement join community API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            Alert.alert('Success', 'You have joined the community!');
+        } catch (error) {
+            Alert.alert('Error', 'Failed to join community. Please try again.');
+        } finally {
+            setIsJoining(false);
+        }
     }, []);
 
     const handleSharePress = useCallback(() => {
-        // TODO: Implement share community logic
-        console.log('Share community');
+        // TODO: Implement share functionality
+        Alert.alert('Coming Soon', 'Share functionality will be implemented soon');
     }, []);
 
     const handleSettingsPress = useCallback(() => {
-        navigation.navigate('CommunitySettings', { communityId: mockCommunity.id });
-    }, [navigation]);
+        navigation.navigate('CommunitySettings', { communityId });
+    }, [navigation, communityId]);
 
     const handleCreatePost = useCallback(() => {
-        navigation.navigate('CreatePost', { communityId: mockCommunity.id });
-    }, [navigation]);
+        navigation.navigate('CreatePost', { communityId });
+    }, [navigation, communityId]);
 
     const handlePostLike = useCallback((postId: string) => {
-        setPosts(currentPosts =>
-            currentPosts.map(post =>
-                post.id === postId
-                    ? {
-                        ...post,
-                        isLiked: !post.isLiked,
-                        likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-                    }
-                    : post
-            )
-        );
-    }, []);
+        dispatch(togglePostLike(postId));
+    }, [dispatch]);
 
     const handlePostComment = useCallback((postId: string) => {
-        navigation.navigate('PostComments', { postId, communityId: mockCommunity.id });
-    }, [navigation]);
+        navigation.navigate('PostComments', { postId, communityId });
+    }, [navigation, communityId]);
 
     const handlePostShare = useCallback((postId: string) => {
-        // TODO: Implement share post logic
-        console.log('Share post:', postId);
+        // TODO: Implement post share functionality
+        Alert.alert('Coming Soon', 'Post share functionality will be implemented soon');
     }, []);
 
-    const handleAuthorPress = useCallback((authorId: string) => {
-        navigation.navigate('Profile', { userId: authorId });
+    const handleAuthorPress = useCallback((userId: string) => {
+        navigation.navigate('Profile', { userId });
     }, [navigation]);
 
     const handlePostOptions = useCallback((postId: string) => {
-        // TODO: Show post options menu
-        console.log('Post options:', postId);
+        // TODO: Implement post options (edit, delete, report)
+        Alert.alert('Coming Soon', 'Post options will be implemented soon');
     }, []);
 
-    if (isLoading) {
+    const renderEmptyList = () => {
+        if (isLoading) {
+            return (
+                <View style={styles.centerContainer}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                </View>
+            );
+        }
+
+        if (error) {
+            return (
+                <EmptyState
+                    icon="alert-circle"
+                    title="Error Loading Posts"
+                    message={error}
+                    action={{
+                        label: 'Try Again',
+                        onPress: loadCommunityData,
+                    }}
+                />
+            );
+        }
+
         return (
-            <View style={styles.loadingContainer}>
+            <EmptyState
+                icon="chatbubble-ellipses"
+                title="No Posts Yet"
+                message="Be the first to create a post in this community!"
+                action={{
+                    label: 'Create Post',
+                    onPress: handleCreatePost,
+                }}
+            />
+        );
+    };
+
+    if (!community) {
+        return (
+            <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
         );
@@ -135,36 +158,51 @@ const CommunityScreen = () => {
         <View style={styles.container}>
             <FlatList
                 data={posts}
-                renderItem={({ item }) => (
+                renderItem={({ item: post }) => (
                     <CommunityPost
-                        {...item}
-                        onLikePress={() => handlePostLike(item.id)}
-                        onCommentPress={() => handlePostComment(item.id)}
-                        onSharePress={() => handlePostShare(item.id)}
-                        onAuthorPress={() => handleAuthorPress(item.author.id)}
-                        onOptionsPress={() => handlePostOptions(item.id)}
+                        id={post.id}
+                        author={post.author}
+                        content={post.content}
+                        images={post.images}
+                        likes={post.likes}
+                        comments={post.comments}
+                        timestamp={post.createdAt}
+                        isLiked={post.isLiked}
+                        onLikePress={() => handlePostLike(post.id)}
+                        onCommentPress={() => handlePostComment(post.id)}
+                        onSharePress={() => handlePostShare(post.id)}
+                        onAuthorPress={() => handleAuthorPress(post.author.id)}
+                        onOptionsPress={() => handlePostOptions(post.id)}
                     />
                 )}
                 keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContent}
                 ListHeaderComponent={
                     <CommunityHeader
-                        {...mockCommunity}
+                        name={community.name}
+                        description={community.description}
+                        avatar={community.avatar}
+                        coverImage={community.coverImage}
+                        memberCount={community.memberCount}
+                        isJoined={false} // TODO: Get from Redux state
                         onJoinPress={handleJoinPress}
                         onSharePress={handleSharePress}
                         onSettingsPress={handleSettingsPress}
+                        role="member" // TODO: Get from Redux state
                     />
                 }
+                ListEmptyComponent={renderEmptyList}
                 refreshControl={
                     <RefreshControl
-                        refreshing={isRefreshing}
+                        refreshing={refreshing || isLoadingComments}
                         onRefresh={handleRefresh}
                         colors={[COLORS.primary]}
+                        tintColor={COLORS.primary}
                     />
                 }
-                contentContainerStyle={styles.listContent}
             />
             <FloatingButton
-                icon="create-outline"
+                icon="add"
                 onPress={handleCreatePost}
                 style={styles.createButton}
             />
@@ -177,14 +215,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
     },
-    loadingContainer: {
+    listContent: {
+        flexGrow: 1,
+        paddingBottom: SIZES.base * 4,
+    },
+    centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLORS.background,
-    },
-    listContent: {
-        paddingBottom: SIZES.base * 4,
+        padding: SIZES.base * 4,
     },
     createButton: {
         position: 'absolute',

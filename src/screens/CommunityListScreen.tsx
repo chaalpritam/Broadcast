@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -6,62 +6,56 @@ import {
     TextInput,
     TouchableOpacity,
     ActivityIndicator,
+    RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchCommunities } from '../store/slices/communitySlice';
+import {
+    selectCommunities,
+    selectCommunitiesLoading,
+    selectCommunitiesError,
+} from '../store/selectors/communitySelectors';
 import CommunityCard from '../components/community/CommunityCard';
 import FloatingButton from '../components/FloatingButton';
-
-// Mock data - will be replaced with Redux state
-const mockCommunities = [
-    {
-        id: '1',
-        name: 'Tech Enthusiasts',
-        description: 'A community for discussing the latest in technology, programming, and innovation.',
-        avatar: 'https://picsum.photos/200',
-        memberCount: 1234,
-    },
-    {
-        id: '2',
-        name: 'Photography Club',
-        description: 'Share your photos, learn new techniques, and connect with fellow photographers.',
-        avatar: 'https://picsum.photos/201',
-        memberCount: 856,
-    },
-    {
-        id: '3',
-        name: 'Fitness & Wellness',
-        description: 'Join us to discuss fitness tips, healthy living, and motivation for a better lifestyle.',
-        avatar: 'https://picsum.photos/202',
-        memberCount: 2345,
-    },
-];
+import EmptyState from '../components/EmptyState';
 
 const CommunityListScreen = () => {
     const navigation = useNavigation();
+    const dispatch = useAppDispatch();
     const [searchQuery, setSearchQuery] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [filteredCommunities, setFilteredCommunities] = useState(mockCommunities);
+    const [refreshing, setRefreshing] = useState(false);
 
-    const handleSearch = useCallback((text: string) => {
-        setSearchQuery(text);
-        if (text.trim() === '') {
-            setFilteredCommunities(mockCommunities);
-        } else {
-            const filtered = mockCommunities.filter(community =>
-                community.name.toLowerCase().includes(text.toLowerCase()) ||
-                community.description.toLowerCase().includes(text.toLowerCase())
-            );
-            setFilteredCommunities(filtered);
-        }
-    }, []);
+    const communities = useAppSelector(selectCommunities);
+    const isLoading = useAppSelector(selectCommunitiesLoading);
+    const error = useAppSelector(selectCommunitiesError);
+
+    const filteredCommunities = communities.filter(community =>
+        community.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        community.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const loadCommunities = useCallback(async () => {
+        await dispatch(fetchCommunities());
+    }, [dispatch]);
+
+    useEffect(() => {
+        loadCommunities();
+    }, [loadCommunities]);
+
+    const handleRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await loadCommunities();
+        setRefreshing(false);
+    }, [loadCommunities]);
 
     const handleCommunityPress = useCallback((communityId: string) => {
         navigation.navigate('Community', { communityId });
     }, [navigation]);
 
-    const handleCreateCommunity = useCallback(() => {
+    const handleCreatePress = useCallback(() => {
         navigation.navigate('CreateCommunity');
     }, [navigation]);
 
@@ -72,14 +66,14 @@ const CommunityListScreen = () => {
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Search communities"
-                    value={searchQuery}
-                    onChangeText={handleSearch}
                     placeholderTextColor={COLORS.gray}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
                 />
                 {searchQuery.length > 0 && (
                     <TouchableOpacity
                         style={styles.clearButton}
-                        onPress={() => handleSearch('')}>
+                        onPress={() => setSearchQuery('')}>
                         <Icon name="close-circle" size={20} color={COLORS.gray} />
                     </TouchableOpacity>
                 )}
@@ -87,24 +81,51 @@ const CommunityListScreen = () => {
         </View>
     );
 
-    const renderEmptyList = () => (
-        <View style={styles.emptyContainer}>
-            <Icon name="people-outline" size={48} color={COLORS.gray} />
-            <Text style={styles.emptyText}>
-                {searchQuery
-                    ? 'No communities found matching your search'
-                    : 'No communities available'}
-            </Text>
-        </View>
-    );
+    const renderEmptyList = () => {
+        if (isLoading) {
+            return (
+                <View style={styles.centerContainer}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                </View>
+            );
+        }
 
-    if (isLoading) {
+        if (error) {
+            return (
+                <EmptyState
+                    icon="alert-circle"
+                    title="Error Loading Communities"
+                    message={error}
+                    action={{
+                        label: 'Try Again',
+                        onPress: loadCommunities,
+                    }}
+                />
+            );
+        }
+
+        if (searchQuery) {
+            return (
+                <EmptyState
+                    icon="search"
+                    title="No Communities Found"
+                    message="Try adjusting your search query"
+                />
+            );
+        }
+
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={COLORS.primary} />
-            </View>
+            <EmptyState
+                icon="people"
+                title="No Communities Yet"
+                message="Be the first to create a community!"
+                action={{
+                    label: 'Create Community',
+                    onPress: handleCreatePress,
+                }}
+            />
         );
-    }
+    };
 
     return (
         <View style={styles.container}>
@@ -112,7 +133,11 @@ const CommunityListScreen = () => {
                 data={filteredCommunities}
                 renderItem={({ item }) => (
                     <CommunityCard
-                        {...item}
+                        id={item.id}
+                        name={item.name}
+                        description={item.description}
+                        avatar={item.avatar}
+                        memberCount={item.memberCount}
                         onPress={() => handleCommunityPress(item.id)}
                     />
                 )}
@@ -120,10 +145,18 @@ const CommunityListScreen = () => {
                 contentContainerStyle={styles.listContent}
                 ListHeaderComponent={renderHeader}
                 ListEmptyComponent={renderEmptyList}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                        colors={[COLORS.primary]}
+                        tintColor={COLORS.primary}
+                    />
+                }
             />
             <FloatingButton
                 icon="add"
-                onPress={handleCreateCommunity}
+                onPress={handleCreatePress}
                 style={styles.createButton}
             />
         </View>
@@ -133,12 +166,6 @@ const CommunityListScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: COLORS.background,
     },
     header: {
@@ -165,23 +192,17 @@ const styles = StyleSheet.create({
         color: COLORS.text,
     },
     clearButton: {
-        padding: SIZES.base / 2,
+        padding: SIZES.base,
     },
     listContent: {
-        padding: SIZES.base * 2,
+        flexGrow: 1,
+        paddingBottom: SIZES.base * 4,
     },
-    emptyContainer: {
+    centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: SIZES.base * 4,
-    },
-    emptyText: {
-        ...FONTS.regular,
-        fontSize: SIZES.font,
-        color: COLORS.gray,
-        textAlign: 'center',
-        marginTop: SIZES.base,
+        padding: SIZES.base * 4,
     },
     createButton: {
         position: 'absolute',
