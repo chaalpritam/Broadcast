@@ -5,6 +5,8 @@ import { COLORS, FONTS } from '../constants/theme';
 // Screens
 import CommunityListScreen from '../screens/CommunityListScreen';
 import CommunityScreen from '../screens/CommunityScreen';
+import CreateCommunityScreen from '../screens/CreateCommunityScreen';
+import CreatePostScreen from '../screens/CreatePostScreen';
 
 // Types
 export type CommunityStackParamList = {
@@ -51,6 +53,22 @@ const CommunityNavigator = () => {
                     // We'll update this dynamically based on the community name
                     // once we have the Redux state
                 })}
+            />
+            <Stack.Screen
+                name="CreateCommunity"
+                component={CreateCommunityScreen}
+                options={{
+                    title: 'Create Community',
+                    presentation: 'modal',
+                }}
+            />
+            <Stack.Screen
+                name="CreatePost"
+                component={CreatePostScreen}
+                options={{
+                    title: 'Create Post',
+                    presentation: 'modal',
+                }}
             />
             {/* Additional screens will be added here as we create them */}
         </Stack.Navigator>
