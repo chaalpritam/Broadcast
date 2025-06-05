@@ -31,27 +31,32 @@ Our upcoming app for group chats, designed to enhance the experience of communic
 The Communities feature has been implemented with the following components:
 
 #### Screens
+
 - **CommunityListScreen**: Displays a list of all communities with search functionality
 - **CommunityScreen**: Shows community details, posts, and member interactions
 - **CreateCommunityScreen**: Form for creating new communities with name, description, and privacy settings
 - **CreatePostScreen**: Interface for creating posts within communities, supporting text and image content
 
 #### State Management
+
 - Redux integration for managing community data, posts, and user interactions
 - Async thunks for fetching communities, posts, and comments
 - Selectors for efficiently accessing community state
 
 #### Navigation
+
 - Dedicated `CommunityNavigator` for community-related screens
 - Integration with the main app navigation via a Communities tab
 
 #### Components
+
 - **CommunityHeader**: Displays community details, cover image, and action buttons
 - **CommunityCard**: Card component for displaying community previews in the list
 - **CommunityPost**: Component for rendering individual posts with like, comment, and share actions
 - **EmptyState**: Reusable component for displaying empty states with appropriate messages
 
 #### Features Implemented
+
 - Viewing communities and posts
 - Creating new communities and posts
 - Liking posts
@@ -61,6 +66,7 @@ The Communities feature has been implemented with the following components:
 - Loading states and error handling
 
 #### Pending Features
+
 - Join/leave community functionality (UI ready, backend integration pending)
 - Post sharing
 - Post options (edit, delete, report)
@@ -93,4 +99,3 @@ npm run android
 - Redux Toolkit for state management
 - React Navigation for routing
 - TypeScript for type safety
-
