@@ -9,9 +9,10 @@ import {
     RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { fetchCommunities } from '../store/slices/communitySlice';
 import {
     selectCommunities,
@@ -22,8 +23,15 @@ import CommunityCard from '../components/community/CommunityCard';
 import FloatingButton from '../components/FloatingButton';
 import EmptyState from '../components/EmptyState';
 
+type RootStackParamList = {
+    Community: { communityId: string };
+    CreateCommunity: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const CommunityListScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp>();
     const dispatch = useAppDispatch();
     const [searchQuery, setSearchQuery] = useState('');
     const [refreshing, setRefreshing] = useState(false);
@@ -136,7 +144,7 @@ const CommunityListScreen = () => {
                         id={item.id}
                         name={item.name}
                         description={item.description}
-                        avatar={item.avatar}
+                        avatar={item.avatar || ''}
                         memberCount={item.memberCount}
                         onPress={() => handleCommunityPress(item.id)}
                     />
@@ -178,7 +186,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: COLORS.lightGray,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         paddingHorizontal: SIZES.base,
     },
     searchIcon: {
@@ -187,7 +195,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         height: 40,
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.text,
     },

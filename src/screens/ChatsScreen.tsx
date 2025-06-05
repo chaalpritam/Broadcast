@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
         marginBottom: SIZES.base,
     },
     name: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.medium,
         color: COLORS.text,
     },
     time: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
     },
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     lastMessage: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.gray,
         flex: 1,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: SIZES.base,
     },
     unreadCount: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.small,
         color: COLORS.white,
     },

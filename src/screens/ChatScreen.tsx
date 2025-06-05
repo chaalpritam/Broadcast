@@ -8,6 +8,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     ActivityIndicator,
+    Text,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
@@ -35,11 +36,11 @@ const ChatScreen = () => {
     const [message, setMessage] = useState('');
 
     // Get chat data from Redux store
-    const { activeChat, messages, isLoading, error } = useAppSelector(state => state.chats);
-    const currentUser = useAppSelector(state => state.auth.user);
+    const { activeChat, messages, isLoading, error } = useAppSelector(state => state.chat);
+    const currentUser = useAppSelector(state => state.chat.user); // Changed from state.auth.user to state.chat.user
     const chatMessages = messages[route.params.chatId] || [];
     const chat = useAppSelector(state =>
-        state.chats.chats.find(c => c.id === route.params.chatId)
+        state.chat.chats.find(c => c.id === route.params.chatId)
     );
 
     useEffect(() => {
@@ -73,7 +74,7 @@ const ChatScreen = () => {
 
         return () => {
             // Clear active chat when component unmounts
-            dispatch(setActiveChat(null));
+            dispatch(setActiveChat(''));
         };
     }, [dispatch, route.params.chatId, currentUser?.id]);
 
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
         padding: SIZES.base * 2,
     },
     errorText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         color: COLORS.error,
         textAlign: 'center',
     },
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
         paddingVertical: SIZES.base,
         marginHorizontal: SIZES.base,
         maxHeight: 100,
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.text,
     },

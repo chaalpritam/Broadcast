@@ -8,7 +8,8 @@ import {
     Alert,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import {
     fetchCommunityPosts,
     fetchPostComments,
@@ -28,8 +29,17 @@ import CommunityPost from '../components/community/CommunityPost';
 import FloatingButton from '../components/FloatingButton';
 import EmptyState from '../components/EmptyState';
 
+type RootStackParamList = {
+    CommunitySettings: { communityId: string };
+    CreatePost: { communityId: string };
+    PostComments: { postId: string; communityId: string };
+    Profile: { userId: string };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const CommunityScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp>();
     const route = useRoute();
     const dispatch = useAppDispatch();
     const { communityId } = route.params as { communityId: string };
@@ -52,7 +62,7 @@ const CommunityScreen = () => {
         await Promise.all([
             dispatch(fetchCommunityPosts(communityId)),
             // Load comments for each post
-            ...posts.map(post => dispatch(fetchPostComments({ postId: post.id, communityId })),
+            ...posts.map(post => dispatch(fetchPostComments({ postId: post.id, communityId })))
         ]);
     }, [dispatch, communityId, posts]);
 
@@ -161,7 +171,7 @@ const CommunityScreen = () => {
                 renderItem={({ item: post }) => (
                     <CommunityPost
                         id={post.id}
-                        author={post.author}
+                        author={post.author as { id: string; name: string; avatar: string }}
                         content={post.content}
                         images={post.images}
                         likes={post.likes}
@@ -181,8 +191,8 @@ const CommunityScreen = () => {
                     <CommunityHeader
                         name={community.name}
                         description={community.description}
-                        avatar={community.avatar}
-                        coverImage={community.coverImage}
+                        avatar={community.avatar || ''}
+                        coverImage={community.coverImage || ''}
                         memberCount={community.memberCount}
                         isJoined={false} // TODO: Get from Redux state
                         onJoinPress={handleJoinPress}

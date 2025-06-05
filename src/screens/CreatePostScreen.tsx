@@ -11,16 +11,19 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
+    Dimensions,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import Header from '../components/Header';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 const CreatePostScreen = () => {
     const navigation = useNavigation();
-    const route = useRoute();
-    const { communityId } = route.params as { communityId: string };
+    // const route = useRoute();
+    // const { communityId } = route.params as { communityId: string };
 
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState('');
@@ -54,7 +57,7 @@ const CreatePostScreen = () => {
     }, [content, navigation]);
 
     const renderImageGrid = () => {
-        if (images.length === 0) return null;
+        if (images.length === 0) {return null;}
 
         return (
             <View style={styles.imageGrid}>
@@ -134,10 +137,10 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: COLORS.white,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         padding: SIZES.base * 1.5,
         minHeight: 120,
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.text,
     },
@@ -148,9 +151,9 @@ const styles = StyleSheet.create({
         gap: SIZES.base,
     },
     imageContainer: {
-        width: (SIZES.width - SIZES.base * 6) / 2,
+        width: (SCREEN_WIDTH - SIZES.base * 6) / 2,
         aspectRatio: 1,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         overflow: 'hidden',
     },
     image: {
@@ -166,9 +169,9 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     addImageButton: {
-        width: (SIZES.width - SIZES.base * 6) / 2,
+        width: (SCREEN_WIDTH - SIZES.base * 6) / 2,
         aspectRatio: 1,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         borderWidth: 2,
         borderColor: COLORS.primary,
         borderStyle: 'dashed',
@@ -181,10 +184,10 @@ const styles = StyleSheet.create({
         marginTop: SIZES.base * 2,
         padding: SIZES.base * 1.5,
         backgroundColor: COLORS.white,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
     },
     attachButtonText: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.primary,
         marginLeft: SIZES.base,
@@ -197,4 +200,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CreatePostScreen; 
+export default CreatePostScreen;

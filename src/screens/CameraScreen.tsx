@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     placeholderText: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.medium,
         color: COLORS.white,
     },
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         opacity: 1,
     },
     modeText: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.white,
         marginLeft: SIZES.base,

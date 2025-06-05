@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     },
     imagePicker: {
         backgroundColor: COLORS.lightGray,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         overflow: 'hidden',
     },
     coverImagePicker: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     placeholderText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
         marginTop: SIZES.base,
@@ -210,17 +210,17 @@ const styles = StyleSheet.create({
         padding: SIZES.base * 2,
     },
     label: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.text,
         marginBottom: SIZES.base,
     },
     input: {
         backgroundColor: COLORS.white,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         padding: SIZES.base * 1.5,
         marginBottom: SIZES.base * 2,
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.text,
     },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: COLORS.white,
         padding: SIZES.base * 1.5,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         marginTop: SIZES.base,
     },
     privacyInfo: {
@@ -245,12 +245,12 @@ const styles = StyleSheet.create({
         marginLeft: SIZES.base * 1.5,
     },
     privacyTitle: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.text,
     },
     privacyDescription: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
         marginTop: 2,

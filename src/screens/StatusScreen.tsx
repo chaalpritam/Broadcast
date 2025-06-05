@@ -4,8 +4,7 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import Header from '../components/Header';
 import Avatar from '../components/Avatar';
 import FloatingButton from '../components/FloatingButton';
-import { useAppSelector } from '../hooks/useAppSelector';
-import { useAppDispatch } from '../hooks/useAppDispatch';
+import { useAppSelector, useAppDispatch } from '../hooks';
 import { setStatuses, setMyStatus } from '../store/slices/statusSlice';
 import type { Status } from '../types/models';
 import type { RootState } from '../store';
@@ -36,7 +35,7 @@ const StatusItem = ({ item, onPress }: { item: StatusItemData; onPress: () => vo
 const StatusScreen = () => {
     const dispatch = useAppDispatch();
     const { statuses, myStatus, isLoading, error } = useAppSelector((state: RootState) => state.status);
-    const currentUser = useAppSelector((state: RootState) => state.auth.user);
+    const currentUser = useAppSelector((state: RootState) => state.chat.user);
 
     useEffect(() => {
         // TODO: Load statuses from API
@@ -149,7 +148,7 @@ const styles = StyleSheet.create({
         padding: SIZES.base * 2,
     },
     errorText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         color: COLORS.error,
         textAlign: 'center',
     },
@@ -165,16 +164,16 @@ const styles = StyleSheet.create({
         marginLeft: SIZES.base * 2,
     },
     name: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.medium,
         color: COLORS.text,
         marginBottom: 4,
     },
     time: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
     },
 });
 
-export default StatusScreen; 
+export default StatusScreen;

@@ -5,8 +5,7 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import Header from '../components/Header';
 import Avatar from '../components/Avatar';
 import FloatingButton from '../components/FloatingButton';
-import { useAppSelector } from '../hooks/useAppSelector';
-import { useAppDispatch } from '../hooks/useAppDispatch';
+import { useAppSelector, useAppDispatch } from '../hooks';
 import { setCalls } from '../store/slices/callsSlice';
 import type { Call } from '../types/models';
 import type { RootState } from '../store';
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
         padding: SIZES.base * 2,
     },
     errorText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         color: COLORS.error,
         textAlign: 'center',
     },
@@ -181,7 +180,7 @@ const styles = StyleSheet.create({
         marginLeft: SIZES.base * 2,
     },
     name: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.medium,
         color: COLORS.text,
         marginBottom: 4,
@@ -194,7 +193,7 @@ const styles = StyleSheet.create({
         marginRight: 4,
     },
     time: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
     },
     callButton: {
@@ -202,4 +201,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CallsScreen; 
+export default CallsScreen;
