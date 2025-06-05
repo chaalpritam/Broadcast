@@ -78,4 +78,4 @@ export interface CommunityState {
     };
     selectedCommunityId: string | null;
     selectedPostId: string | null;
-} 
+}
