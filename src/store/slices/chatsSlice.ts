@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { Chat, Message } from '../../types/models';
 
 interface ChatsState {
+    [x: string]: any;
     chats: Chat[];
     activeChat: string | null;
     messages: Record<string, Message[]>;
@@ -77,4 +78,4 @@ export const {
     setError,
 } = chatsSlice.actions;
 
-export default chatsSlice.reducer; 
+export default chatsSlice.reducer;

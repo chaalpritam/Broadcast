@@ -52,4 +52,4 @@ export const {
     setError,
 } = callsSlice.actions;
 
-export default callsSlice.reducer; 
+export default callsSlice.reducer;

@@ -78,4 +78,4 @@ export const {
     setError,
 } = statusSlice.actions;
 
-export default statusSlice.reducer; 
+export default statusSlice.reducer;

@@ -1,5 +1,5 @@
 import { RootState } from '../index';
-import { Community, CommunityPost, CommunityComment } from '../../types/community';
+// import { Community, CommunityPost, CommunityComment } from '../../types/community';
 
 // Community selectors
 export const selectCommunities = (state: RootState) => Object.values(state.community.communities);
@@ -47,4 +47,4 @@ export const selectCommunityPostsWithComments = (state: RootState, communityId: 
         ...post,
         comments: selectCommentsByPostId(state, post.id),
     }));
-}; 
+};

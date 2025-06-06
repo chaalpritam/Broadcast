@@ -53,7 +53,7 @@ export const fetchCommunityPosts = createAsyncThunk(
 
 export const fetchPostComments = createAsyncThunk(
     'community/fetchPostComments',
-    async ({ postId, communityId }: { postId: string; communityId: string }, { rejectWithValue }) => {
+    async ({ postId }: { postId: string; communityId: string }, { rejectWithValue }) => {
         try {
             // TODO: Replace with actual API call
             const response = await new Promise<CommunityComment[]>((resolve) =>
@@ -206,4 +206,4 @@ export const {
     toggleCommentLike,
 } = communitySlice.actions;
 
-export default communitySlice.reducer; 
+export default communitySlice.reducer;
