@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { COLORS, FONTS } from '../constants/theme';
 
 // Screens
@@ -19,7 +19,7 @@ export type CommunityStackParamList = {
     Profile: { userId: string };
 };
 
-const Stack = createStackNavigator<CommunityStackParamList>();
+const Stack = createNativeStackNavigator<CommunityStackParamList>();
 
 const CommunityNavigator = () => {
     return (
@@ -27,15 +27,15 @@ const CommunityNavigator = () => {
             screenOptions={{
                 headerStyle: {
                     backgroundColor: COLORS.white,
-                    elevation: 0,
-                    shadowOpacity: 0,
+                    // elevation: 0,
+                    // shadowOpacity: 0,
                 },
                 headerTitleStyle: {
-                    ...FONTS.medium,
+                    fontFamily: FONTS.medium,
                     fontSize: 18,
                     color: COLORS.text,
                 },
-                headerBackTitleVisible: false,
+                // headerBackTitleVisible: false,
                 headerTintColor: COLORS.primary,
             }}>
             <Stack.Screen
@@ -48,7 +48,7 @@ const CommunityNavigator = () => {
             <Stack.Screen
                 name="Community"
                 component={CommunityScreen}
-                options={({ route }) => ({
+                options={({ route }: { route: any }) => ({
                     title: 'Community',
                     // We'll update this dynamically based on the community name
                     // once we have the Redux state
@@ -75,4 +75,4 @@ const CommunityNavigator = () => {
     );
 };
 
-export default CommunityNavigator; 
+export default CommunityNavigator;

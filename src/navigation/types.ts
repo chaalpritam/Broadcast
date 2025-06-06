@@ -22,4 +22,4 @@ export type CommunityStackParamList = {
     PostComments: { postId: string; communityId: string };
     CommunitySettings: { communityId: string };
     Profile: { userId: string };
-}; 
+};
