@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 4,
     },
     messageText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
     },
     sentText: {
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         color: COLORS.text,
     },
     timeText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small - 2,
         marginTop: 4,
         alignSelf: 'flex-end',
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MessageBubble; 
+export default MessageBubble;

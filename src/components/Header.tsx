@@ -89,12 +89,12 @@ const styles = StyleSheet.create({
         marginRight: SIZES.base,
     },
     title: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.medium,
         color: COLORS.white,
     },
     subtitle: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.white,
         opacity: 0.8,
@@ -108,4 +108,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Header; 
+export default Header;

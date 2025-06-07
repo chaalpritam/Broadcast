@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS, SIZES, SHADOWS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 
 interface FloatingButtonProps {
     icon: string;
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
         right: SIZES.base * 3,
         justifyContent: 'center',
         alignItems: 'center',
-        ...SHADOWS.medium,
+        // ...SHADOWS.medium,
     },
 });
 
-export default FloatingButton; 
+export default FloatingButton;

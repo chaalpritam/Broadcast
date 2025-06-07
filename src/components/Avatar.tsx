@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS } from '../constants/theme';
 
 interface AvatarProps {
     uri: string;
@@ -65,4 +65,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Avatar; 
+export default Avatar;
