@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     name: {
-        ...FONTS.bold,
+        fontFamily: FONTS.bold,
         fontSize: SIZES.large,
         color: COLORS.text,
         marginRight: SIZES.base,
@@ -132,19 +132,19 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     roleText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small - 2,
         color: COLORS.white,
         textTransform: 'capitalize',
     },
     memberCount: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
         marginBottom: 4,
     },
     description: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.text,
     },
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     joinButtonText: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.white,
     },
@@ -175,4 +175,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CommunityHeader; 
+export default CommunityHeader;

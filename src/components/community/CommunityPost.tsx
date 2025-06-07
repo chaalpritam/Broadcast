@@ -56,7 +56,7 @@ const CommunityPost = ({
     };
 
     const renderImages = () => {
-        if (!images || images.length === 0) return null;
+        if (!images || images.length === 0) {return null;}
 
         if (images.length === 1) {
             return (
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     authorName: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.text,
         marginRight: SIZES.base,
@@ -195,13 +195,13 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     roleText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small - 2,
         color: COLORS.white,
         textTransform: 'capitalize',
     },
     timestamp: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
     },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         padding: SIZES.base,
     },
     content: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.text,
         marginBottom: SIZES.base,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
         borderRadius: SIZES.base,
     },
     moreImagesText: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.font,
         color: COLORS.white,
     },
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
         marginRight: SIZES.base * 2,
     },
     actionText: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
         marginLeft: 4,
@@ -271,4 +271,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CommunityPost; 
+export default CommunityPost;

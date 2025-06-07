@@ -14,7 +14,7 @@ interface CommunityCardProps {
 }
 
 const CommunityCard = ({
-    id,
+    // id,
     name,
     description,
     avatar,
@@ -53,9 +53,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: SIZES.base * 2,
         backgroundColor: COLORS.white,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.base,
         marginBottom: SIZES.base,
-        ...COLORS.shadow,
+        // ...COLORS.shadow,
     },
     avatar: {
         width: 60,
@@ -69,13 +69,13 @@ const styles = StyleSheet.create({
         marginRight: SIZES.base,
     },
     name: {
-        ...FONTS.medium,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.medium,
         color: COLORS.text,
         marginBottom: 4,
     },
     description: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
         marginBottom: 4,
@@ -85,11 +85,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     memberCount: {
-        ...FONTS.regular,
+        fontFamily: FONTS.regular,
         fontSize: SIZES.small - 2,
         color: COLORS.gray,
         marginLeft: 4,
     },
 });
 
-export default CommunityCard; 
+export default CommunityCard;
