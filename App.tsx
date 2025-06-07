@@ -9,6 +9,7 @@ import MainNavigator from './src/navigation/MainNavigator';
 function App(): React.JSX.Element {
   return (
     <Provider store={store}>
+      {/* eslint-disable-next-line react-native/no-inline-styles */}
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <NavigationContainer>
