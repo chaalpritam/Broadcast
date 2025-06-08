@@ -1,4 +1,4 @@
-package com.broadcastapp
+package com.broadcast
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -1,4 +1,4 @@
-package com.broadcastapp
+package com.broadcast
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
