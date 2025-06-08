@@ -4,6 +4,7 @@ import { COLORS } from '../constants/theme';
 import Icon from 'react-native-vector-icons/Ionicons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
+import { PROFILE_IMAGES } from '../constants/images';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
@@ -12,7 +13,7 @@ const ProfileScreen = ({ navigation }: Props) => {
         <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <Image
-                    source={{ uri: 'https://via.placeholder.com/150' }}
+                    source={{ uri: PROFILE_IMAGES.defaultUser }}
                     style={styles.profileImage}
                 />
                 <Text style={styles.name}>John Doe</Text>

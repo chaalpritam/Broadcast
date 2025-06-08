@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { COLORS, FONTS, SIZES, SHADOWS } from '../constants/theme';
 import type { RootStackParamList } from '../navigation/types';
+import { PROFILE_IMAGES, getRandomProfileImage } from '../constants/images';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -21,7 +22,7 @@ const MOCK_CHATS = [
         name: 'John Doe',
         lastMessage: 'Hey, how are you?',
         time: '10:30 AM',
-        avatar: 'https://via.placeholder.com/50',
+        avatar: PROFILE_IMAGES.users[0],
         unreadCount: 2,
     },
     {
@@ -29,10 +30,33 @@ const MOCK_CHATS = [
         name: 'Jane Smith',
         lastMessage: 'See you tomorrow!',
         time: '9:45 AM',
-        avatar: 'https://via.placeholder.com/50',
+        avatar: PROFILE_IMAGES.users[1],
         unreadCount: 0,
     },
-    // Add more mock chats as needed
+    {
+        id: '3',
+        name: 'Mike Johnson',
+        lastMessage: 'The meeting is at 2 PM',
+        time: 'Yesterday',
+        avatar: PROFILE_IMAGES.users[2],
+        unreadCount: 1,
+    },
+    {
+        id: '4',
+        name: 'Sarah Wilson',
+        lastMessage: 'Thanks for your help!',
+        time: 'Yesterday',
+        avatar: PROFILE_IMAGES.users[3],
+        unreadCount: 0,
+    },
+    {
+        id: '5',
+        name: 'David Brown',
+        lastMessage: 'Can you review the document?',
+        time: 'Monday',
+        avatar: PROFILE_IMAGES.users[4],
+        unreadCount: 3,
+    },
 ];
 
 const ChatItem = ({ item }: { item: typeof MOCK_CHATS[0] }) => {

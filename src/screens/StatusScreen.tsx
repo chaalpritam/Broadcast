@@ -8,6 +8,7 @@ import { useAppSelector, useAppDispatch } from '../hooks';
 import { setStatuses, setMyStatus } from '../store/slices/statusSlice';
 import type { Status } from '../types/models';
 import type { RootState } from '../store';
+import { PROFILE_IMAGES, getRandomProfileImage } from '../constants/images';
 
 interface StatusItemData extends Status {
     name: string;
@@ -49,7 +50,7 @@ const StatusScreen = () => {
                 time: 'Tap to add status update',
                 viewedBy: [],
                 name: 'My Status',
-                avatar: currentUser?.avatar || 'https://via.placeholder.com/50',
+                avatar: PROFILE_IMAGES.defaultUser,
                 isMyStatus: true,
             },
             {
@@ -60,7 +61,7 @@ const StatusScreen = () => {
                 time: 'Today, 10:30 AM',
                 viewedBy: [],
                 name: 'John Doe',
-                avatar: 'https://via.placeholder.com/50',
+                avatar: PROFILE_IMAGES.users[0],
                 isMyStatus: false,
             },
             {
@@ -71,14 +72,25 @@ const StatusScreen = () => {
                 time: 'Today, 9:45 AM',
                 viewedBy: [],
                 name: 'Jane Smith',
-                avatar: 'https://via.placeholder.com/50',
+                avatar: PROFILE_IMAGES.users[1],
+                isMyStatus: false,
+            },
+            {
+                id: '4',
+                userId: '4',
+                type: 'image' as const,
+                content: 'https://via.placeholder.com/500',
+                time: 'Yesterday, 5:30 PM',
+                viewedBy: [],
+                name: 'Mike Johnson',
+                avatar: PROFILE_IMAGES.users[2],
                 isMyStatus: false,
             },
         ];
 
         dispatch(setStatuses(mockStatuses));
         dispatch(setMyStatus(mockStatuses[0]));
-    }, [dispatch, currentUser?.avatar]);
+    }, [dispatch]);
 
     const handleStatusPress = (status: StatusItemData) => {
         if (status.isMyStatus) {
