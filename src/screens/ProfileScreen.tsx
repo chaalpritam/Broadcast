@@ -17,7 +17,7 @@ const ProfileScreen = ({ navigation }: Props) => {
                     style={styles.profileImage}
                 />
                 <Text style={styles.name}>John Doe</Text>
-                <Text style={styles.status}>Hey there! I am using BroadcastApp</Text>
+                <Text style={styles.status}>Hey there! I am using Broadcast</Text>
             </View>
 
             <View style={styles.section}>
