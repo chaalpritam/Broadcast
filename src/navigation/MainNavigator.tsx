@@ -9,7 +9,7 @@ import { MainTabParamList, RootStackParamList } from './types';
 import ChatsScreen from '../screens/ChatsScreen';
 import StatusScreen from '../screens/StatusScreen';
 import CalendarScreen from '../screens/CalendarScreen';
-import CameraScreen from '../screens/CameraScreen';
+import WalletsScreen from '../screens/WalletsScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -68,11 +68,11 @@ const MainTabs = () => {
                 }}
             />
             <Tab.Screen
-                name="Camera"
-                component={CameraScreen}
+                name="Wallets"
+                component={WalletsScreen}
                 options={{
                     tabBarIcon: ({ color, size }) => (
-                        <Icon name="camera" size={size} color={color} />
+                        <Icon name="wallet-outline" size={size} color={color} />
                     ),
                 }}
             />

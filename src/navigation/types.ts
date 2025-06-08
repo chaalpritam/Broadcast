@@ -10,7 +10,7 @@ export type MainTabParamList = {
     Chats: undefined;
     Status: undefined;
     Calendar: undefined;
-    Camera: undefined;
+    Wallets: undefined;
     Communities: undefined;
 };
 
