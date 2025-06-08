@@ -6,6 +6,7 @@ import {
     FlatList,
     TouchableOpacity,
     ActivityIndicator,
+    Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
@@ -55,38 +56,64 @@ const EventItem = ({ item, onPress }: { item: Event; onPress: () => void }) => {
         }
     };
 
+    const getEventTypeLabel = () => {
+        switch (item.type) {
+            case 'meeting':
+                return 'Meeting';
+            case 'call':
+                return 'Call';
+            case 'reminder':
+                return 'Reminder';
+            default:
+                return 'Event';
+        }
+    };
+
     return (
-        <TouchableOpacity style={styles.eventItem} onPress={onPress}>
-            <View style={[styles.eventIcon, { backgroundColor: getEventColor() }]}>
-                <Icon name={getEventIcon()} size={24} color={COLORS.white} />
+        <TouchableOpacity 
+            style={styles.eventItem} 
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
+            <View style={styles.eventHeader}>
+                <View style={[styles.eventType, { backgroundColor: getEventColor() + '15' }]}>
+                    <Icon name={getEventIcon()} size={16} color={getEventColor()} />
+                    <Text style={[styles.eventTypeText, { color: getEventColor() }]}>
+                        {getEventTypeLabel()}
+                    </Text>
+                </View>
+                <Text style={styles.dateText}>{item.date}</Text>
             </View>
-            <View style={styles.eventInfo}>
+
+            <View style={styles.eventContent}>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.description} numberOfLines={2}>
                     {item.description}
                 </Text>
-                <View style={styles.eventDetails}>
-                    <View style={styles.detailItem}>
-                        <Icon name="calendar" size={16} color={COLORS.gray} />
-                        <Text style={styles.detailText}>{item.date}</Text>
+
+                <View style={styles.timeLocationContainer}>
+                    <View style={styles.timeLocationItem}>
+                        <Icon name="time-outline" size={16} color={COLORS.gray} />
+                        <Text style={styles.timeLocationText}>{item.time}</Text>
                     </View>
-                    <View style={styles.detailItem}>
-                        <Icon name="time" size={16} color={COLORS.gray} />
-                        <Text style={styles.detailText}>{item.time}</Text>
-                    </View>
-                    <View style={styles.detailItem}>
-                        <Icon name="location" size={16} color={COLORS.gray} />
-                        <Text style={styles.detailText}>{item.location}</Text>
+                    <View style={styles.timeLocationItem}>
+                        <Icon name="location-outline" size={16} color={COLORS.gray} />
+                        <Text style={styles.timeLocationText} numberOfLines={1}>
+                            {item.location}
+                        </Text>
                     </View>
                 </View>
+
+                <View style={styles.divider} />
+
                 <View style={styles.eventFooter}>
-                    <View style={styles.organizer}>
-                        <Icon name="person" size={16} color={COLORS.gray} />
+                    <View style={styles.organizerContainer}>
+                        <Icon name="person-outline" size={16} color={COLORS.gray} />
                         <Text style={styles.organizerText}>{item.organizer.name}</Text>
                     </View>
-                    <View style={styles.participants}>
-                        <Icon name="people" size={16} color={COLORS.gray} />
-                        <Text style={styles.participantsText}>{item.participants}</Text>
+                    <View style={styles.participantsContainer}>
+                        <Icon name="people-outline" size={16} color={COLORS.gray} />
+                        <Text style={styles.participantsText}>{item.participants} attending</Text>
                     </View>
                 </View>
             </View>
@@ -237,66 +264,91 @@ const styles = StyleSheet.create({
         padding: SIZES.base * 2,
     },
     eventItem: {
-        flexDirection: 'row',
         backgroundColor: COLORS.white,
-        borderRadius: SIZES.base,
-        padding: SIZES.base * 2,
+        borderRadius: SIZES.base * 2,
         marginBottom: SIZES.base * 2,
-        // ...SHADOWS.small,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: COLORS.lightGray,
     },
-    eventIcon: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
+    eventHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginRight: SIZES.base * 2,
+        padding: SIZES.base * 2,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.lightGray,
+        backgroundColor: COLORS.background,
     },
-    eventInfo: {
-        flex: 1,
+    eventType: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: SIZES.base,
+        paddingVertical: SIZES.base / 2,
+        borderRadius: SIZES.base,
+    },
+    eventTypeText: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.small,
+        marginLeft: SIZES.base / 2,
+    },
+    dateText: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.small,
+        color: COLORS.gray,
+    },
+    eventContent: {
+        padding: SIZES.base * 2,
     },
     title: {
-        fontFamily: FONTS.medium,
+        fontFamily: FONTS.bold,
         fontSize: SIZES.medium,
         color: COLORS.text,
-        marginBottom: 4,
+        marginBottom: SIZES.base,
     },
     description: {
         fontFamily: FONTS.regular,
         fontSize: SIZES.font,
         color: COLORS.gray,
-        marginBottom: SIZES.base,
+        marginBottom: SIZES.base * 1.5,
+        lineHeight: SIZES.font * 1.5,
     },
-    eventDetails: {
-        marginBottom: SIZES.base,
+    timeLocationContainer: {
+        marginBottom: SIZES.base * 1.5,
     },
-    detailItem: {
+    timeLocationItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4,
+        marginBottom: SIZES.base / 2,
     },
-    detailText: {
+    timeLocationText: {
         fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
-        marginLeft: 8,
+        marginLeft: SIZES.base,
+        flex: 1,
+    },
+    divider: {
+        height: 1,
+        backgroundColor: COLORS.lightGray,
+        marginVertical: SIZES.base * 1.5,
     },
     eventFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    organizer: {
+    organizerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     organizerText: {
-        fontFamily: FONTS.regular,
+        fontFamily: FONTS.medium,
         fontSize: SIZES.small,
-        color: COLORS.gray,
-        marginLeft: 8,
+        color: COLORS.text,
+        marginLeft: SIZES.base,
     },
-    participants: {
+    participantsContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -304,7 +356,7 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.regular,
         fontSize: SIZES.small,
         color: COLORS.gray,
-        marginLeft: 8,
+        marginLeft: SIZES.base,
     },
 });
 
