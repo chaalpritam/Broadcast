@@ -8,7 +8,7 @@ import { MainTabParamList, RootStackParamList } from './types';
 // Import screens
 import ChatsScreen from '../screens/ChatsScreen';
 import StatusScreen from '../screens/StatusScreen';
-import CallsScreen from '../screens/CallsScreen';
+import CalendarScreen from '../screens/CalendarScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -59,11 +59,11 @@ const MainTabs = () => {
                 }}
             />
             <Tab.Screen
-                name="Calls"
-                component={CallsScreen}
+                name="Calendar"
+                component={CalendarScreen}
                 options={{
                     tabBarIcon: ({ color, size }) => (
-                        <Icon name="call-outline" size={size} color={color} />
+                        <Icon name="calendar-outline" size={size} color={color} />
                     ),
                 }}
             />
