@@ -4,7 +4,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
-import DummyScreen from './src/screens/DummyScreen';
+// import DummyScreen from './src/screens/DummyScreen';
+import MainNavigator from './src/navigation/MainNavigator';
 
 function App(): React.JSX.Element {
   return (
@@ -13,7 +14,8 @@ function App(): React.JSX.Element {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <NavigationContainer>
-            <DummyScreen />
+            <MainNavigator />
+            {/* <DummyScreen /> */}
           </NavigationContainer>
         </SafeAreaProvider>
       </GestureHandlerRootView>
