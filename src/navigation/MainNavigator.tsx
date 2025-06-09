@@ -13,7 +13,7 @@ import WalletsScreen from '../screens/WalletsScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import CommunityNavigator from './CommunityNavigator';
+import AgentsNavigator from './AgentsNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -77,11 +77,11 @@ const MainTabs = () => {
                 }}
             />
             <Tab.Screen
-                name="Communities"
-                component={CommunityNavigator}
+                name="Agents"
+                component={AgentsNavigator}
                 options={{
                     tabBarIcon: ({ color, size }) => (
-                        <Icon name="people-outline" size={size} color={color} />
+                        <Icon name="construct-outline" size={size} color={color} />
                     ),
                     headerShown: false,
                 }}

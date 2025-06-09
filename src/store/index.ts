@@ -3,6 +3,7 @@ import chatReducer from './slices/chatsSlice';
 import statusReducer from './slices/statusSlice';
 import callsReducer from './slices/callsSlice';
 import communityReducer from './slices/communitySlice';
+import agentReducer from './slices/agentSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     status: statusReducer,
     calls: callsReducer,
     community: communityReducer,
+    agent: agentReducer,
   },
 });
 

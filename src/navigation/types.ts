@@ -3,7 +3,7 @@ export type RootStackParamList = {
     Chat: { chatId: string; name: string };
     Profile: { userId: string };
     Settings: undefined;
-    CommunityStack: undefined;
+    AgentStack: undefined;
 };
 
 export type MainTabParamList = {
@@ -11,15 +11,13 @@ export type MainTabParamList = {
     Status: undefined;
     Calendar: undefined;
     Wallets: undefined;
-    Communities: undefined;
+    Agents: undefined;
 };
 
-export type CommunityStackParamList = {
-    CommunityList: undefined;
-    Community: { communityId: string };
-    CreateCommunity: undefined;
-    CreatePost: { communityId: string };
-    PostComments: { postId: string; communityId: string };
-    CommunitySettings: { communityId: string };
+export type AgentsStackParamList = {
+    AgentsList: undefined;
+    Agent: { agentId: string };
+    CreateAgent: undefined;
+    AgentSettings: { agentId: string };
     Profile: { userId: string };
 };
