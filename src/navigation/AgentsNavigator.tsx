@@ -23,20 +23,25 @@ const AgentsNavigator = () => {
         <Stack.Navigator
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: COLORS.white,
+                    backgroundColor: COLORS.primary,
                 },
                 headerTitleStyle: {
                     fontFamily: FONTS.medium,
                     fontSize: 18,
                     color: COLORS.text,
                 },
-                headerTintColor: COLORS.primary,
+                headerTintColor: COLORS.white,
             }}>
             <Stack.Screen
                 name="AgentsList"
                 component={AgentsScreen}
                 options={{
-                    title: 'AI Agents',
+                    title: 'Agents',
+                    headerTitleStyle: {
+                        fontFamily: FONTS.medium,
+                        fontSize: 18,
+                        color: COLORS.white,
+                    },
                 }}
             />
             <Stack.Screen
@@ -52,6 +57,11 @@ const AgentsNavigator = () => {
                 options={{
                     title: 'Add Agent',
                     presentation: 'modal',
+                    headerTitleStyle: {
+                        fontFamily: FONTS.medium,
+                        fontSize: 18,
+                        color: COLORS.white,
+                    },
                 }}
             />
             {/* Additional screens will be added here as we create them */}

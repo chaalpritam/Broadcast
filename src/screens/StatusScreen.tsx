@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import Header from '../components/Header';
 import Avatar from '../components/Avatar';
 import FloatingButton from '../components/FloatingButton';
 import { useAppSelector, useAppDispatch } from '../hooks';
@@ -122,7 +121,6 @@ const StatusScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Header title="Status" />
             <FlatList
                 data={allStatuses}
                 renderItem={({ item }) => (

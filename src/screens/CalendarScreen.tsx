@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import Header from '../components/Header';
 import FloatingButton from '../components/FloatingButton';
 import { PROFILE_IMAGES } from '../constants/images';
 
@@ -217,7 +216,6 @@ const CalendarScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Header title="Calendar" />
             <FlatList
                 data={events}
                 renderItem={({ item }) => (

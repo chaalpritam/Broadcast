@@ -10,8 +10,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import Header from '../components/Header';
-import FloatingButton from '../components/FloatingButton';
 
 interface Reward {
     id: string;
@@ -188,7 +186,6 @@ const WalletsScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Header title="Wallet" />
             
             <View style={styles.balanceCard}>
                 <View style={styles.balanceHeader}>
