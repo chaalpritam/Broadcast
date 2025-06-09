@@ -1,0 +1,192 @@
+Create a modern, responsive web application for "Broadcast" - a community-focused messaging platform that serves as a WhatsApp alternative with Web3 features. The app should have a clean, professional design with a WhatsApp-inspired color scheme and modern UI components.
+
+### **Design System & Theme**
+- **Primary Colors**: WhatsApp green (#128C7E) and light green (#25D366)
+- **Background**: White (#FFFFFF) with dark mode support (#111B21)
+- **Text**: Dark (#111B21) for light mode, light (#E9EDEF) for dark mode
+- **Accent Colors**: Gray (#667781), light gray (#E9EDEF), error red (#FF3B30), success green (#34C759)
+- **Typography**: Clean, modern fonts with proper hierarchy
+- **Shadows**: Subtle shadows for depth and elevation
+
+### **Core Features to Implement**
+
+#### **1. Navigation & Layout**
+- **Bottom Navigation Bar** with 5 main tabs:
+  - Chats (chatbubbles icon)
+  - Status (camera icon) 
+  - Calendar (calendar icon)
+  - Wallets (wallet icon)
+  - Agents (construct icon)
+- **Top Header** with settings icon and responsive design
+- **Sidebar Navigation** for desktop view
+- **Responsive Layout** that works on mobile, tablet, and desktop
+
+#### **2. Communities Feature (Main Focus)**
+- **Community List Screen**:
+  - Grid/list view of community cards
+  - Search bar with real-time filtering
+  - Pull-to-refresh functionality
+  - Empty state with illustration
+  - Floating action button for creating communities
+  
+- **Community Cards**:
+  - Community avatar/cover image
+  - Community name and description
+  - Member count and privacy status
+  - Last activity timestamp
+  - Hover effects and click interactions
+
+- **Community Detail Screen**:
+  - Community header with cover image, name, description
+  - Member count and join/leave button
+  - Posts feed with infinite scroll
+  - Floating action button for creating posts
+  - Community settings and moderation tools
+
+- **Post Components**:
+  - Post content with text and image support
+  - Author information with avatar and role
+  - Like, comment, and share buttons
+  - Timestamp and engagement metrics
+  - Post actions (edit, delete, report)
+
+- **Create Community Modal**:
+  - Form with name, description, privacy settings
+  - Image upload for community avatar/cover
+  - Category selection
+  - Member invitation options
+
+- **Create Post Modal**:
+  - Rich text editor with formatting options
+  - Image upload and gallery
+  - Community selection
+  - Post visibility settings
+
+#### **3. Chat System**
+- **Chat List**:
+  - Recent conversations with avatars
+  - Last message preview and timestamp
+  - Unread message indicators
+  - Online/offline status
+  - Search functionality
+
+- **Chat Interface**:
+  - Message bubbles with different styles for sent/received
+  - Typing indicators
+  - Message timestamps
+  - File/image sharing
+  - Emoji picker
+  - Voice message support
+
+#### **4. Status/Stories Feature**
+- **Status List**:
+  - Circular status avatars with progress rings
+  - Status preview thumbnails
+  - "My Status" section at the top
+  - Add status button
+
+- **Status Viewer**:
+  - Full-screen status viewing
+  - Progress bar for disappearing status
+  - Reply and reaction options
+  - Navigation between statuses
+
+#### **5. Agents Feature**
+- **Agent List**:
+  - Agent cards with icons and descriptions
+  - Category filtering (Wallet, Transaction, DeFi, NFT, Governance, Analytics)
+  - Search functionality
+  - Agent status and performance metrics
+
+- **Agent Detail**:
+  - Agent information and capabilities
+  - Usage statistics
+  - Configuration options
+  - Integration settings
+
+#### **6. Calendar & Events**
+- **Calendar View**:
+  - Monthly/weekly/daily calendar views
+  - Event indicators and details
+  - Community event integration
+  - Event creation and management
+
+#### **7. Wallet Integration**
+- **Wallet Dashboard**:
+  - Balance display for multiple tokens
+  - Transaction history
+  - Send/receive functionality
+  - NFT gallery
+  - DeFi protocol integration
+
+### **Technical Requirements**
+
+#### **State Management**
+- Implement Redux-like state management for:
+  - Communities and posts
+  - Chat messages and conversations
+  - User authentication and profiles
+  - Agent configurations
+  - Wallet balances and transactions
+
+#### **Data Models**
+- **Community**: id, name, description, avatar, coverImage, memberCount, privacy, createdAt
+- **Post**: id, communityId, content, images, author, likes, comments, isLiked, createdAt
+- **User**: id, name, avatar, role, onlineStatus
+- **Agent**: id, name, description, category, icon, status, configuration
+
+#### **UI Components to Create**
+- **Reusable Components**:
+  - Avatar (circular, square, with status indicators)
+  - Button (primary, secondary, outline, ghost variants)
+  - Card (with hover effects and actions)
+  - Modal (with backdrop and animations)
+  - Input (text, search, textarea with validation)
+  - Badge (for roles, status, notifications)
+  - Loading states and skeletons
+  - Empty states with illustrations
+
+#### **Responsive Design**
+- **Mobile First**: Optimized for mobile devices
+- **Tablet**: Enhanced layout for medium screens
+- **Desktop**: Full-featured layout with sidebar navigation
+- **Touch Interactions**: Swipe gestures, pull-to-refresh, smooth animations
+
+#### **Accessibility**
+- Proper ARIA labels and semantic HTML
+- Keyboard navigation support
+- High contrast mode support
+- Screen reader compatibility
+
+### **Advanced Features**
+
+#### **Web3 Integration**
+- Wallet connection (MetaMask, WalletConnect)
+- Token balance display
+- NFT gallery integration
+- DeFi protocol interactions
+- On-chain rewards and incentives
+
+#### **Real-time Features**
+- WebSocket integration for live messaging
+- Real-time notifications
+- Live status updates
+- Collaborative features
+
+#### **Performance Optimizations**
+- Lazy loading for images and components
+- Virtual scrolling for large lists
+- Optimistic updates for better UX
+- Caching strategies
+
+### **Design Guidelines**
+- Use modern CSS with Tailwind CSS or similar utility framework
+- Implement smooth animations and transitions
+- Ensure consistent spacing and typography
+- Create a cohesive design language across all components
+- Support both light and dark themes
+- Use modern icons (Lucide, Heroicons, or similar)
+
+```
+
+Focus on creating a polished, production-ready web application that maintains the core functionality of the mobile app while leveraging web-specific capabilities for enhanced user experience.
