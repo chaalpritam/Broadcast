@@ -2,13 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS } from '../constants/theme';
 import Icon from 'react-native-vector-icons/Ionicons';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
 import { PROFILE_IMAGES } from '../constants/images';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
-
-const ProfileScreen = ({ navigation }: Props) => {
+const ProfileScreen = () => {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>
@@ -39,12 +35,9 @@ const ProfileScreen = ({ navigation }: Props) => {
                     <Icon name="chevron-forward" size={24} color={COLORS.gray} />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
-                    style={styles.menuItem}
-                    onPress={() => navigation.navigate('Settings')}
-                >
-                    <Icon name="settings-outline" size={24} color={COLORS.primary} />
-                    <Text style={styles.menuText}>Settings</Text>
+                <TouchableOpacity style={styles.menuItem}>
+                    <Icon name="help-circle-outline" size={24} color={COLORS.primary} />
+                    <Text style={styles.menuText}>Help</Text>
                     <Icon name="chevron-forward" size={24} color={COLORS.gray} />
                 </TouchableOpacity>
             </View>

@@ -2,10 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS } from '../constants/theme';
 import Icon from 'react-native-vector-icons/Ionicons';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 const SettingsScreen = () => {
     const [notifications, setNotifications] = useState(true);

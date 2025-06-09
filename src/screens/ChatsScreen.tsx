@@ -16,6 +16,17 @@ import { PROFILE_IMAGES, getRandomProfileImage } from '../constants/images';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+type ChatItem = {
+    id: string;
+    name: string;
+    lastMessage: string;
+    time: string;
+    avatar: string;
+    unreadCount: number;
+    isGroup: boolean;
+    participantCount?: number;
+};
+
 // Mock data for individual chats
 const MOCK_CHATS = [
     {
@@ -112,7 +123,7 @@ const MOCK_GROUPS = [
 // Combine individual chats and groups
 const ALL_CHATS = [...MOCK_CHATS, ...MOCK_GROUPS];
 
-const ChatItem = ({ item }: { item: typeof ALL_CHATS[0] }) => {
+const ChatItem = ({ item }: { item: ChatItem }) => {
     const navigation = useNavigation<NavigationProp>();
 
     return (

@@ -1,6 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { TouchableOpacity, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../constants/theme';
 import { MainTabParamList, RootStackParamList } from './types';
@@ -18,6 +21,37 @@ import AgentsNavigator from './AgentsNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+const HeaderRight = () => {
+    const navigation = useNavigation<NavigationProp>();
+    
+    return (
+        <View style={{ flexDirection: 'row', marginRight: 15 }}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('Settings')}
+            >
+                <Icon name="settings-outline" size={24} color={COLORS.white} />
+            </TouchableOpacity>
+        </View>
+    );
+};
+
+const HeaderLeft = () => {
+    const navigation = useNavigation<NavigationProp>();
+    
+    return (
+        <View style={{ flexDirection: 'row', marginLeft: 15 }}>
+            <TouchableOpacity
+                style={{ marginRight: 10 }}
+                onPress={() => navigation.navigate('Profile', { userId: 'current' })}
+            >
+                <Icon name="person-outline" size={24} color={COLORS.white} />
+            </TouchableOpacity>
+        </View>
+    );
+};
 
 const MainTabs = () => {
     return (
@@ -40,6 +74,8 @@ const MainTabs = () => {
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
+                headerRight: () => <HeaderRight />,
+                headerLeft: () => <HeaderLeft />,
             }}>
             <Tab.Screen
                 name="Chats"
