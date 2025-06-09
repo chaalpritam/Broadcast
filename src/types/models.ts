@@ -12,7 +12,18 @@ export interface Message {
   time: string;
   isSent: boolean;
   senderId: string;
+  senderName?: string;
   chatId: string;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  avatar: string;
+  participants: User[];
+  adminId: string;
+  createdAt: string;
+  description?: string;
 }
 
 export interface Chat {
@@ -20,6 +31,8 @@ export interface Chat {
   participants: User[];
   lastMessage?: Message;
   unreadCount: number;
+  isGroup?: boolean;
+  groupInfo?: Group;
 }
 
 export interface Call {

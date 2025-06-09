@@ -59,6 +59,7 @@ const ChatScreen = () => {
                 time: '10:30 AM',
                 isSent: true,
                 senderId: currentUser?.id || 'me',
+                senderName: currentUser?.name || 'You',
                 chatId: route.params.chatId,
             },
             {
@@ -67,6 +68,7 @@ const ChatScreen = () => {
                 time: '10:31 AM',
                 isSent: false,
                 senderId: route.params.chatId,
+                senderName: route.params.isGroup ? 'John Doe' : route.params.name,
                 chatId: route.params.chatId,
             },
         ];
@@ -87,6 +89,7 @@ const ChatScreen = () => {
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isSent: true,
             senderId: currentUser.id,
+            senderName: currentUser.name || 'You',
             chatId: route.params.chatId,
         };
 
@@ -104,8 +107,17 @@ const ChatScreen = () => {
             onPress: () => console.log('Audio call'),
         },
         {
-            icon: 'ellipsis-vertical',
-            onPress: () => console.log('More options'),
+            icon: route.params.isGroup ? 'people-outline' : 'ellipsis-vertical',
+            onPress: () => {
+                if (route.params.isGroup) {
+                    navigation.navigate('GroupInfo', { 
+                        groupId: route.params.chatId, 
+                        groupName: route.params.name 
+                    });
+                } else {
+                    console.log('More options');
+                }
+            },
         },
     ];
 
@@ -131,9 +143,10 @@ const ChatScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
             <Header
-                title={chat?.participants[0]?.name || route.params.name}
+                title={route.params.name}
                 avatar={chat?.participants[0]?.avatar}
                 actions={headerActions}
+                subtitle={route.params.isGroup ? 'Group' : undefined}
             />
             <FlatList
                 data={chatMessages}
@@ -142,6 +155,7 @@ const ChatScreen = () => {
                         message={item.text}
                         time={item.time}
                         isSent={item.isSent}
+                        senderName={item.senderName}
                     />
                 )}
                 keyExtractor={item => item.id}
@@ -159,7 +173,7 @@ const ChatScreen = () => {
                     style={styles.input}
                     value={message}
                     onChangeText={setMessage}
-                    placeholder="Message"
+                    placeholder={route.params.isGroup ? "Message to group" : "Message"}
                     placeholderTextColor={COLORS.gray}
                     multiline
                 />

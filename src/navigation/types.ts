@@ -1,6 +1,7 @@
 export type RootStackParamList = {
     Main: undefined;
-    Chat: { chatId: string; name: string };
+    Chat: { chatId: string; name: string; isGroup?: boolean };
+    GroupInfo: { groupId: string; groupName: string };
     Profile: { userId: string };
     Settings: undefined;
     AgentStack: undefined;

@@ -11,6 +11,7 @@ import StatusScreen from '../screens/StatusScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import WalletsScreen from '../screens/WalletsScreen';
 import ChatScreen from '../screens/ChatScreen';
+import GroupInfoScreen from '../screens/GroupInfoScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AgentsNavigator from './AgentsNavigator';
@@ -108,6 +109,7 @@ const MainNavigator = () => {
                 options={{ headerShown: false }}
             />
             <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="GroupInfo" component={GroupInfoScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>

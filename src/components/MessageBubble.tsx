@@ -6,6 +6,7 @@ interface MessageBubbleProps {
     message: string;
     time: string;
     isSent: boolean;
+    senderName?: string;
     style?: ViewStyle;
     textStyle?: TextStyle;
     timeStyle?: TextStyle;
@@ -15,6 +16,7 @@ const MessageBubble = ({
     message,
     time,
     isSent,
+    senderName,
     style,
     textStyle,
     timeStyle,
@@ -26,6 +28,9 @@ const MessageBubble = ({
                 isSent ? styles.sentContainer : styles.receivedContainer,
                 style,
             ]}>
+            {senderName && !isSent && (
+                <Text style={styles.senderName}>{senderName}</Text>
+            )}
             <View
                 style={[
                     styles.bubble,
@@ -62,6 +67,13 @@ const styles = StyleSheet.create({
     },
     receivedContainer: {
         alignSelf: 'flex-start',
+    },
+    senderName: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.small,
+        color: COLORS.primary,
+        marginBottom: 2,
+        marginLeft: SIZES.base,
     },
     bubble: {
         padding: SIZES.base * 2,
