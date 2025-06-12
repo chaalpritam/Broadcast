@@ -7,6 +7,8 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Image,
+    Alert,
+    ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
@@ -106,132 +108,250 @@ const RewardItem = ({ item }: { item: Reward }) => {
 };
 
 const WalletsScreen = () => {
-    const [balance, setBalance] = useState(0);
     const [rewards, setRewards] = useState<Reward[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isLoadingRewards, setIsLoadingRewards] = useState(true);
+    const [isWalletConnected, setIsWalletConnected] = useState(false);
+    const [isConnecting, setIsConnecting] = useState(false);
 
     useEffect(() => {
-        // TODO: Load wallet data from API
-        // For now, we'll use mock data
-        const mockRewards: Reward[] = [
-            {
-                id: '1',
-                title: 'Community Engagement Bonus',
-                amount: 50,
-                date: 'Today, 2:30 PM',
-                type: 'community',
-                status: 'completed',
-                communityName: 'Tech Enthusiasts',
-            },
-            {
-                id: '2',
-                title: 'Referral Reward',
-                amount: 25,
-                date: 'Yesterday, 5:45 PM',
-                type: 'referral',
-                status: 'completed',
-            },
-            {
-                id: '3',
-                title: 'Task Completion Bonus',
-                amount: 15,
-                date: 'Mar 15, 2024',
-                type: 'task',
-                status: 'pending',
-                communityName: 'Design Community',
-            },
-            {
-                id: '4',
-                title: 'Community Contribution',
-                amount: 30,
-                date: 'Mar 14, 2024',
-                type: 'community',
-                status: 'completed',
-                communityName: 'Crypto Traders',
-            },
-            {
-                id: '5',
-                title: 'New Member Referral',
-                amount: 20,
-                date: 'Mar 13, 2024',
-                type: 'referral',
-                status: 'pending',
-            },
-        ];
-
-        // Simulate API call
-        setTimeout(() => {
-            setBalance(1250.75);
-            setRewards(mockRewards);
-            setIsLoading(false);
-        }, 1000);
+        // Load initial rewards
+        loadRewards();
     }, []);
 
-    if (isLoading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={COLORS.primary} />
-            </View>
-        );
-    }
+    const loadRewards = async () => {
+        setIsLoadingRewards(true);
+        try {
+            // Mock rewards data
+            const mockRewards: Reward[] = [
+                {
+                    id: '1',
+                    title: 'Community Engagement Bonus',
+                    amount: 50,
+                    date: 'Today, 2:30 PM',
+                    type: 'community',
+                    status: 'completed',
+                    communityName: 'Tech Enthusiasts',
+                },
+                {
+                    id: '2',
+                    title: 'Referral Reward',
+                    amount: 25,
+                    date: 'Yesterday, 5:45 PM',
+                    type: 'referral',
+                    status: 'completed',
+                },
+                {
+                    id: '3',
+                    title: 'Task Completion Bonus',
+                    amount: 15,
+                    date: 'Mar 15, 2024',
+                    type: 'task',
+                    status: 'pending',
+                    communityName: 'Design Community',
+                },
+            ];
 
-    if (error) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
-        );
-    }
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setRewards(mockRewards);
+        } catch (error) {
+            console.error('Error loading rewards:', error);
+            Alert.alert('Error', 'Failed to load rewards');
+        } finally {
+            setIsLoadingRewards(false);
+        }
+    };
+
+    const handleWalletConnect = async () => {
+        setIsConnecting(true);
+        try {
+            // Simulate wallet connection
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            setIsWalletConnected(true);
+            Alert.alert('Success', 'Wallet connected successfully!');
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'Failed to connect wallet');
+        } finally {
+            setIsConnecting(false);
+        }
+    };
+
+    const handleWalletDisconnect = async () => {
+        try {
+            setIsWalletConnected(false);
+            setRewards([]);
+            Alert.alert('Success', 'Wallet disconnected successfully!');
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'Failed to disconnect wallet');
+        }
+    };
+
+    const handleDeposit = () => {
+        if (!isWalletConnected) {
+            Alert.alert('Error', 'Please connect your wallet first');
+            return;
+        }
+        Alert.alert('Deposit', 'Deposit functionality coming soon!');
+    };
+
+    const handleWithdraw = () => {
+        if (!isWalletConnected) {
+            Alert.alert('Error', 'Please connect your wallet first');
+            return;
+        }
+        Alert.alert('Withdraw', 'Withdraw functionality coming soon!');
+    };
+
+    const handleSwap = () => {
+        if (!isWalletConnected) {
+            Alert.alert('Error', 'Please connect your wallet first');
+            return;
+        }
+        Alert.alert('Swap', 'Swap functionality coming soon!');
+    };
+
+    const getConnectionStatus = () => {
+        if (isConnecting) return 'Connecting...';
+        if (isWalletConnected) return 'Connected';
+        return 'Not Connected';
+    };
+
+    const getConnectionColor = () => {
+        if (isConnecting) return COLORS.warning;
+        if (isWalletConnected) return COLORS.success;
+        return COLORS.error;
+    };
 
     return (
-        <View style={styles.container}>
-            
-            <View style={styles.balanceCard}>
-                <View style={styles.balanceHeader}>
-                    <Text style={styles.balanceLabel}>Total Balance</Text>
-                    <TouchableOpacity style={styles.refreshButton}>
-                        <Icon name="refresh-outline" size={20} color={COLORS.primary} />
-                    </TouchableOpacity>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+            {/* Wallet Connection Section */}
+            <View style={styles.walletSection}>
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Wallet Connection</Text>
+                    <View style={styles.statusContainer}>
+                        <View style={[styles.statusDot, { backgroundColor: getConnectionColor() }]} />
+                        <Text style={[styles.statusText, { color: getConnectionColor() }]}>
+                            {getConnectionStatus()}
+                        </Text>
+                    </View>
                 </View>
-                <View style={styles.balanceAmount}>
-                    <Image 
-                        source={{ uri: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png' }}
-                        style={styles.usdcIcon}
-                    />
-                    <Text style={styles.balanceValue}>{balance.toLocaleString()} USDC</Text>
-                </View>
-                <View style={styles.balanceActions}>
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon name="arrow-down-outline" size={20} color={COLORS.white} />
-                        <Text style={styles.actionButtonText}>Deposit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon name="arrow-up-outline" size={20} color={COLORS.white} />
-                        <Text style={styles.actionButtonText}>Withdraw</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon name="swap-horizontal-outline" size={20} color={COLORS.white} />
-                        <Text style={styles.actionButtonText}>Swap</Text>
-                    </TouchableOpacity>
-                </View>
+
+                {!isWalletConnected ? (
+                    <View style={styles.connectCard}>
+                        <Icon name="wallet-outline" size={48} color={COLORS.gray} />
+                        <Text style={styles.connectTitle}>Connect Your Wallet</Text>
+                        <Text style={styles.connectDescription}>
+                            Connect your wallet to view your balance, manage transactions, and earn rewards.
+                        </Text>
+                        <TouchableOpacity
+                            style={[styles.connectButton, { backgroundColor: isConnecting ? COLORS.gray : COLORS.primary }]}
+                            onPress={handleWalletConnect}
+                            disabled={isConnecting}
+                            activeOpacity={0.7}
+                        >
+                            {isConnecting ? (
+                                <ActivityIndicator size="small" color={COLORS.white} />
+                            ) : (
+                                <Icon name="wallet-outline" size={20} color={COLORS.white} />
+                            )}
+                            <Text style={styles.connectButtonText}>
+                                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={styles.walletInfoCard}>
+                        <View style={styles.walletInfoHeader}>
+                            <View style={styles.statusIndicator}>
+                                <Icon name="radio-button-on" size={12} color={COLORS.success} />
+                                <Text style={styles.statusText}>Connected</Text>
+                            </View>
+                            <TouchableOpacity style={styles.refreshButton}>
+                                <Icon name="refresh-outline" size={20} color={COLORS.primary} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.addressSection}>
+                            <Text style={styles.label}>Address</Text>
+                            <Text style={styles.address}>0x1234...5678</Text>
+                        </View>
+                        <View style={styles.balanceSection}>
+                            <Text style={styles.label}>Balance</Text>
+                            <Text style={styles.balance}>0.5000 ETH</Text>
+                        </View>
+                        <TouchableOpacity onPress={handleWalletDisconnect} style={styles.disconnectButton}>
+                            <Icon name="log-out-outline" size={20} color={COLORS.error} />
+                            <Text style={styles.disconnectText}>Disconnect</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
 
+            {/* Balance Section - Only show when connected */}
+            {isWalletConnected && (
+                <View style={styles.balanceCard}>
+                    <View style={styles.balanceHeader}>
+                        <Text style={styles.balanceLabel}>Total Balance</Text>
+                        <TouchableOpacity style={styles.refreshButton}>
+                            <Icon name="refresh-outline" size={20} color={COLORS.primary} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.balanceAmount}>
+                        <Image 
+                            source={{ uri: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' }}
+                            style={styles.ethIcon}
+                        />
+                        <Text style={styles.balanceValue}>0.5000 ETH</Text>
+                    </View>
+                    <View style={styles.balanceActions}>
+                        <TouchableOpacity style={styles.actionButton} onPress={handleDeposit}>
+                            <Icon name="arrow-down-outline" size={20} color={COLORS.white} />
+                            <Text style={styles.actionButtonText}>Deposit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.actionButton} onPress={handleWithdraw}>
+                            <Icon name="arrow-up-outline" size={20} color={COLORS.white} />
+                            <Text style={styles.actionButtonText}>Withdraw</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.actionButton} onPress={handleSwap}>
+                            <Icon name="swap-horizontal-outline" size={20} color={COLORS.white} />
+                            <Text style={styles.actionButtonText}>Swap</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
+
+            {/* Rewards Section */}
             <View style={styles.rewardsSection}>
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>Rewards History</Text>
-                    <TouchableOpacity>
-                        <Text style={styles.viewAllText}>View All</Text>
+                    <TouchableOpacity onPress={loadRewards}>
+                        <Text style={styles.viewAllText}>Refresh</Text>
                     </TouchableOpacity>
                 </View>
-                <FlatList
-                    data={rewards}
-                    renderItem={({ item }) => <RewardItem item={item} />}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.rewardsList}
-                />
+                
+                {isLoadingRewards ? (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color={COLORS.primary} />
+                        <Text style={styles.loadingText}>Loading rewards...</Text>
+                    </View>
+                ) : rewards.length > 0 ? (
+                    <FlatList
+                        data={rewards}
+                        renderItem={({ item }) => <RewardItem item={item} />}
+                        keyExtractor={item => item.id}
+                        contentContainerStyle={styles.rewardsList}
+                        scrollEnabled={false}
+                    />
+                ) : (
+                    <View style={styles.emptyContainer}>
+                        <Icon name="gift-outline" size={48} color={COLORS.gray} />
+                        <Text style={styles.emptyTitle}>No Rewards Yet</Text>
+                        <Text style={styles.emptyDescription}>
+                            Start participating in communities to earn rewards!
+                        </Text>
+                    </View>
+                )}
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -240,23 +360,129 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
     },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: COLORS.background,
+    walletSection: {
+        margin: SIZES.base * 2,
     },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: COLORS.background,
-        padding: SIZES.base * 2,
+        marginBottom: SIZES.base * 2,
     },
-    errorText: {
+    sectionTitle: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.large,
+        color: COLORS.text,
+    },
+    statusContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SIZES.base / 2,
+    },
+    statusDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+    },
+    statusText: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.small,
+    },
+    connectCard: {
+        backgroundColor: COLORS.white,
+        padding: SIZES.base * 3,
+        borderRadius: SIZES.base * 2,
+        borderWidth: 1,
+        borderColor: COLORS.lightGray,
+        alignItems: 'center',
+    },
+    connectTitle: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.large,
+        color: COLORS.text,
+        marginTop: SIZES.base * 2,
+        marginBottom: SIZES.base,
+    },
+    connectDescription: {
         fontFamily: FONTS.regular,
-        color: COLORS.error,
+        fontSize: SIZES.font,
+        color: COLORS.gray,
         textAlign: 'center',
+        marginBottom: SIZES.base * 2,
+        lineHeight: 20,
+    },
+    connectButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: SIZES.base * 2,
+        paddingVertical: SIZES.base * 1.5,
+        borderRadius: SIZES.base,
+        gap: SIZES.base,
+        width: '100%',
+    },
+    connectButtonText: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.font,
+        color: COLORS.white,
+    },
+    walletInfoCard: {
+        backgroundColor: COLORS.white,
+        padding: SIZES.base * 2,
+        borderRadius: SIZES.base * 2,
+        borderWidth: 1,
+        borderColor: COLORS.lightGray,
+    },
+    walletInfoHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: SIZES.base * 2,
+    },
+    statusIndicator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: SIZES.base / 2,
+    },
+    refreshButton: {
+        padding: SIZES.base / 2,
+    },
+    addressSection: {
+        marginBottom: SIZES.base * 2,
+    },
+    label: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.small,
+        color: COLORS.gray,
+        marginBottom: SIZES.base / 2,
+    },
+    address: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.font,
+        color: COLORS.text,
+    },
+    balanceSection: {
+        marginBottom: SIZES.base * 2,
+    },
+    balance: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.large,
+        color: COLORS.text,
+    },
+    disconnectButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: SIZES.base,
+        borderRadius: SIZES.base,
+        borderWidth: 1,
+        borderColor: COLORS.error,
+        gap: SIZES.base / 2,
+    },
+    disconnectText: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.font,
+        color: COLORS.error,
     },
     balanceCard: {
         backgroundColor: COLORS.white,
@@ -277,15 +503,12 @@ const styles = StyleSheet.create({
         fontSize: SIZES.font,
         color: COLORS.gray,
     },
-    refreshButton: {
-        padding: SIZES.base,
-    },
     balanceAmount: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: SIZES.base * 2,
     },
-    usdcIcon: {
+    ethIcon: {
         width: 32,
         height: 32,
         marginRight: SIZES.base,
@@ -317,28 +540,27 @@ const styles = StyleSheet.create({
         marginLeft: SIZES.base / 2,
     },
     rewardsSection: {
-        flex: 1,
+        margin: SIZES.base * 2,
         backgroundColor: COLORS.white,
-        borderTopLeftRadius: SIZES.base * 2,
-        borderTopRightRadius: SIZES.base * 2,
+        borderRadius: SIZES.base * 2,
         paddingTop: SIZES.base * 2,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: SIZES.base * 2,
-        marginBottom: SIZES.base,
-    },
-    sectionTitle: {
-        fontFamily: FONTS.bold,
-        fontSize: SIZES.medium,
-        color: COLORS.text,
+        borderWidth: 1,
+        borderColor: COLORS.lightGray,
     },
     viewAllText: {
         fontFamily: FONTS.medium,
         fontSize: SIZES.small,
         color: COLORS.primary,
+    },
+    loadingContainer: {
+        padding: SIZES.base * 4,
+        alignItems: 'center',
+    },
+    loadingText: {
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.font,
+        color: COLORS.gray,
+        marginTop: SIZES.base,
     },
     rewardsList: {
         padding: SIZES.base * 2,
@@ -423,6 +645,24 @@ const styles = StyleSheet.create({
     statusText: {
         fontFamily: FONTS.medium,
         fontSize: SIZES.small,
+    },
+    emptyContainer: {
+        padding: SIZES.base * 4,
+        alignItems: 'center',
+    },
+    emptyTitle: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.large,
+        color: COLORS.text,
+        marginTop: SIZES.base * 2,
+        marginBottom: SIZES.base,
+    },
+    emptyDescription: {
+        fontFamily: FONTS.regular,
+        fontSize: SIZES.font,
+        color: COLORS.gray,
+        textAlign: 'center',
+        lineHeight: 20,
     },
 });
 

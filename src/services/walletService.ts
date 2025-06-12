@@ -1,152 +1,124 @@
 import { ethers } from 'ethers';
 import { WalletInfo } from '../types/models';
 
+// Mock wallet service for React Native
+// In a real app, you would integrate with WalletConnect, MetaMask Mobile, or other mobile wallet solutions
 class WalletService {
-  private provider: ethers.BrowserProvider | null = null;
-  private signer: ethers.JsonRpcSigner | null = null;
+  private provider: ethers.JsonRpcProvider | null = null;
+  private signer: ethers.Wallet | null = null;
+  private mockWalletInfo: WalletInfo | null = null;
 
   async connectWallet(): Promise<WalletInfo> {
     try {
-      // Check if MetaMask is installed
-      if (!window.ethereum) {
-        throw new Error('MetaMask is not installed. Please install MetaMask to use this feature.');
-      }
+      // For React Native, we'll use a mock implementation
+      // In production, you would integrate with WalletConnect, MetaMask Mobile, etc.
+      
+      // Simulate wallet connection delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Request account access
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const account = accounts[0];
-
-      if (!account) {
-        throw new Error('No account selected');
-      }
-
-      // Create provider and signer
-      this.provider = new ethers.BrowserProvider(window.ethereum);
-      this.signer = await this.provider.getSigner();
-
-      // Get network info
-      const network = await this.provider.getNetwork();
-      const chainId = Number(network.chainId);
-
-      // Get balance
-      const balance = await this.provider.getBalance(account);
-      const balanceInEth = ethers.formatEther(balance);
-
-      // Try to get ENS name
-      let ensName: string | undefined;
-      try {
-        ensName = await this.provider.lookupAddress(account);
-      } catch (error) {
-        console.log('ENS lookup failed:', error);
-      }
-
-      const walletInfo: WalletInfo = {
-        address: account,
-        chainId,
-        balance: balanceInEth,
-        ensName,
+      // Create mock wallet info
+      const mockWalletInfo: WalletInfo = {
+        address: '0x1234567890123456789012345678901234567890',
+        chainId: 1,
+        balance: '0.5',
+        ensName: 'user.eth',
       };
 
-      return walletInfo;
+      this.mockWalletInfo = mockWalletInfo;
+      
+      // Create a mock provider for Ethereum mainnet
+      this.provider = new ethers.JsonRpcProvider('https://eth-mainnet.g.alchemy.com/v2/demo');
+      
+      // Create a mock signer (in real app, this would be from wallet connection)
+      this.signer = new ethers.Wallet('0x1234567890123456789012345678901234567890123456789012345678901234', this.provider);
+
+      return mockWalletInfo;
     } catch (error) {
       console.error('Wallet connection error:', error);
-      throw error;
+      throw new Error('Failed to connect wallet. Please try again.');
     }
   }
 
   async disconnectWallet(): Promise<void> {
     this.provider = null;
     this.signer = null;
+    this.mockWalletInfo = null;
   }
 
   async getBalance(address: string): Promise<string> {
-    if (!this.provider) {
-      throw new Error('Wallet not connected');
-    }
+    try {
+      if (this.mockWalletInfo) {
+        // Return mock balance with some variation
+        const baseBalance = parseFloat(this.mockWalletInfo.balance);
+        const variation = (Math.random() - 0.5) * 0.1; // ±0.05 ETH variation
+        return (baseBalance + variation).toFixed(4);
+      }
+      
+      if (!this.provider) {
+        throw new Error('Wallet not connected');
+      }
 
-    const balance = await this.provider.getBalance(address);
-    return ethers.formatEther(balance);
+      const balance = await this.provider.getBalance(address);
+      return ethers.formatEther(balance);
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+      return '0.0000';
+    }
   }
 
-  async getSigner(): Promise<ethers.JsonRpcSigner | null> {
+  async getSigner(): Promise<ethers.Wallet | null> {
     return this.signer;
   }
 
-  async getProvider(): Promise<ethers.BrowserProvider | null> {
+  async getProvider(): Promise<ethers.JsonRpcProvider | null> {
     return this.provider;
   }
 
   async switchNetwork(chainId: number): Promise<void> {
-    if (!window.ethereum) {
-      throw new Error('MetaMask is not installed');
-    }
-
     try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${chainId.toString(16)}` }],
-      });
-    } catch (error: any) {
-      // If the network doesn't exist, add it
-      if (error.code === 4902) {
-        await this.addNetwork(chainId);
-      } else {
-        throw error;
+      // In React Native, network switching would be handled by the wallet app
+      // For now, we'll just update our mock wallet info
+      if (this.mockWalletInfo) {
+        this.mockWalletInfo.chainId = chainId;
       }
+      
+      // Simulate network switch delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.error('Error switching network:', error);
+      throw new Error('Failed to switch network');
     }
-  }
-
-  private async addNetwork(chainId: number): Promise<void> {
-    const networkConfigs: { [key: number]: any } = {
-      137: {
-        chainId: '0x89',
-        chainName: 'Polygon Mainnet',
-        nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
-          decimals: 18,
-        },
-        rpcUrls: ['https://polygon-rpc.com/'],
-        blockExplorerUrls: ['https://polygonscan.com/'],
-      },
-      80001: {
-        chainId: '0x13881',
-        chainName: 'Mumbai Testnet',
-        nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
-          decimals: 18,
-        },
-        rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
-        blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
-      },
-    };
-
-    const config = networkConfigs[chainId];
-    if (!config) {
-      throw new Error(`Network configuration not found for chainId: ${chainId}`);
-    }
-
-    await window.ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [config],
-    });
   }
 
   async signMessage(message: string): Promise<string> {
-    if (!this.signer) {
-      throw new Error('Wallet not connected');
-    }
+    try {
+      if (!this.signer) {
+        throw new Error('Wallet not connected');
+      }
 
-    return await this.signer.signMessage(message);
+      return await this.signer.signMessage(message);
+    } catch (error) {
+      console.error('Error signing message:', error);
+      throw new Error('Failed to sign message');
+    }
   }
 
   async sendTransaction(transaction: ethers.TransactionRequest): Promise<ethers.TransactionResponse> {
-    if (!this.signer) {
-      throw new Error('Wallet not connected');
-    }
+    try {
+      if (!this.signer) {
+        throw new Error('Wallet not connected');
+      }
 
-    return await this.signer.sendTransaction(transaction);
+      return await this.signer.sendTransaction(transaction);
+    } catch (error) {
+      console.error('Error sending transaction:', error);
+      throw new Error('Failed to send transaction');
+    }
+  }
+
+  // Helper method to get current wallet info
+  getCurrentWalletInfo(): WalletInfo | null {
+    return this.mockWalletInfo;
   }
 }
 

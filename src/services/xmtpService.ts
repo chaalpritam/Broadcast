@@ -1,18 +1,70 @@
-import { Client, Conversation, DecodedMessage } from '@xmtp/react-native-sdk';
 import { ethers } from 'ethers';
 import { XMTPConversation } from '../types/models';
 
+// Mock XMTP service for React Native
+// In a real app, you would use the actual XMTP React Native SDK
 class XMTPService {
-  private client: Client | null = null;
+  private client: any | null = null;
+  private mockConversations: XMTPConversation[] = [];
 
-  async connect(signer: ethers.JsonRpcSigner): Promise<Client> {
+  async connect(signer: ethers.Wallet): Promise<any> {
     try {
-      // Create XMTP client
-      this.client = await Client.create(signer, { env: 'production' });
-      return this.client;
+      // For React Native, we'll use a mock implementation
+      // In production, you would use the actual XMTP React Native SDK
+      
+      // Simulate XMTP connection delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Create mock client
+      const mockClient = {
+        address: signer.address,
+        conversations: {
+          list: async () => this.mockConversations,
+          newConversation: async (peerAddress: string) => ({
+            topic: `conversation_${peerAddress.slice(0, 8)}`,
+            peerAddress,
+            messages: async () => [],
+            send: async (content: string) => {
+              console.log('Mock XMTP message sent:', content);
+            },
+            streamMessages: async (callback: (message: any) => void) => {
+              console.log('Mock XMTP message streaming started');
+            },
+          }),
+          stream: async (callback: (conversation: any) => void) => {
+            console.log('Mock XMTP conversation streaming started');
+          },
+        },
+        canMessage: async (peerAddress: string) => true,
+        close: async () => {
+          this.client = null;
+        },
+      };
+
+      this.client = mockClient;
+
+      // Initialize mock conversations
+      this.mockConversations = [
+        {
+          id: '1',
+          peerAddress: '0xabcdef1234567890abcdef1234567890abcdef12',
+          lastMessage: 'Hey, how are you?',
+          lastMessageTime: new Date().toISOString(),
+          unreadCount: 2,
+        },
+        {
+          id: '2',
+          peerAddress: '0xfedcba0987654321fedcba0987654321fedcba09',
+          lastMessage: 'Thanks for the help!',
+          lastMessageTime: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+          unreadCount: 0,
+        },
+      ];
+
+      return mockClient;
     } catch (error) {
       console.error('XMTP connection error:', error);
-      throw error;
+      throw new Error('Failed to connect to XMTP');
     }
   }
 
@@ -20,6 +72,7 @@ class XMTPService {
     if (this.client) {
       await this.client.close();
       this.client = null;
+      this.mockConversations = [];
     }
   }
 
@@ -29,27 +82,11 @@ class XMTPService {
     }
 
     try {
-      const conversations = await this.client.conversations.list();
-      
-      const xmtpConversations: XMTPConversation[] = await Promise.all(
-        conversations.map(async (conversation) => {
-          const messages = await conversation.messages();
-          const lastMessage = messages[messages.length - 1];
-          
-          return {
-            id: conversation.topic,
-            peerAddress: conversation.peerAddress,
-            lastMessage: lastMessage?.content || '',
-            lastMessageTime: lastMessage?.sentAt?.toISOString() || '',
-            unreadCount: 0, // XMTP doesn't have built-in unread count, would need custom implementation
-          };
-        })
-      );
-
-      return xmtpConversations;
+      // Return mock conversations
+      return this.mockConversations;
     } catch (error) {
       console.error('Error fetching conversations:', error);
-      throw error;
+      throw new Error('Failed to fetch conversations');
     }
   }
 
@@ -61,13 +98,28 @@ class XMTPService {
     try {
       const conversation = await this.client.conversations.newConversation(peerAddress);
       await conversation.send(content);
+      
+      // Update mock conversation
+      const existingConversation = this.mockConversations.find(c => c.peerAddress === peerAddress);
+      if (existingConversation) {
+        existingConversation.lastMessage = content;
+        existingConversation.lastMessageTime = new Date().toISOString();
+      } else {
+        this.mockConversations.unshift({
+          id: `conversation_${peerAddress.slice(0, 8)}`,
+          peerAddress,
+          lastMessage: content,
+          lastMessageTime: new Date().toISOString(),
+          unreadCount: 0,
+        });
+      }
     } catch (error) {
       console.error('Error sending message:', error);
-      throw error;
+      throw new Error('Failed to send message');
     }
   }
 
-  async getMessages(peerAddress: string, limit?: number): Promise<DecodedMessage[]> {
+  async getMessages(peerAddress: string, limit?: number): Promise<any[]> {
     if (!this.client) {
       throw new Error('XMTP client not connected');
     }
@@ -78,11 +130,11 @@ class XMTPService {
       return messages;
     } catch (error) {
       console.error('Error fetching messages:', error);
-      throw error;
+      throw new Error('Failed to fetch messages');
     }
   }
 
-  async subscribeToMessages(peerAddress: string, callback: (message: DecodedMessage) => void): Promise<void> {
+  async subscribeToMessages(peerAddress: string, callback: (message: any) => void): Promise<void> {
     if (!this.client) {
       throw new Error('XMTP client not connected');
     }
@@ -92,11 +144,11 @@ class XMTPService {
       await conversation.streamMessages(callback);
     } catch (error) {
       console.error('Error subscribing to messages:', error);
-      throw error;
+      throw new Error('Failed to subscribe to messages');
     }
   }
 
-  async subscribeToConversations(callback: (conversation: Conversation) => void): Promise<void> {
+  async subscribeToConversations(callback: (conversation: any) => void): Promise<void> {
     if (!this.client) {
       throw new Error('XMTP client not connected');
     }
@@ -105,7 +157,7 @@ class XMTPService {
       await this.client.conversations.stream(callback);
     } catch (error) {
       console.error('Error subscribing to conversations:', error);
-      throw error;
+      throw new Error('Failed to subscribe to conversations');
     }
   }
 
@@ -122,7 +174,7 @@ class XMTPService {
     }
   }
 
-  async getClient(): Promise<Client | null> {
+  async getClient(): Promise<any | null> {
     return this.client;
   }
 
