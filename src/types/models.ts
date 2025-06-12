@@ -4,6 +4,7 @@ export interface User {
   avatar: string;
   status?: string;
   lastSeen?: string;
+  walletAddress?: string;
 }
 
 export interface Message {
@@ -58,4 +59,39 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+}
+
+export interface WalletState {
+  isConnected: boolean;
+  address: string | null;
+  chainId: number | null;
+  balance: string | null;
+  isLoading: boolean;
+  error: string | null;
+  isConnecting: boolean;
+}
+
+export interface XMTPState {
+  isConnected: boolean;
+  client: any | null;
+  conversations: any[];
+  isLoading: boolean;
+  error: string | null;
+  isConnecting: boolean;
+}
+
+export interface WalletInfo {
+  address: string;
+  chainId: number;
+  balance: string;
+  ensName?: string;
+  avatar?: string;
+}
+
+export interface XMTPConversation {
+  id: string;
+  peerAddress: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  unreadCount: number;
 }

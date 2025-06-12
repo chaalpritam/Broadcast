@@ -4,6 +4,9 @@ import statusReducer from './slices/statusSlice';
 import callsReducer from './slices/callsSlice';
 import communityReducer from './slices/communitySlice';
 import agentReducer from './slices/agentSlice';
+import authReducer from './slices/authSlice';
+import walletReducer from './slices/walletSlice';
+import xmtpReducer from './slices/xmtpSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +15,9 @@ export const store = configureStore({
     calls: callsReducer,
     community: communityReducer,
     agent: agentReducer,
+    auth: authReducer,
+    wallet: walletReducer,
+    xmtp: xmtpReducer,
   },
 });
 
