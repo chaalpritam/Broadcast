@@ -47,7 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-		<key>UIAppFonts</key>
+	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
 		<string>MaterialIcons.ttf</string>
@@ -58,6 +58,38 @@
 		<string>FontAwesome6_Brands.ttf</string>
 		<string>FontAwesome6_Regular.ttf</string>
 		<string>FontAwesome6_Solid.ttf</string>
+	</array>
+	
+	<!-- Deep Linking Configuration -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<!-- MetaMask Deep Linking -->
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>metamask</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>metamask</string>
+			</array>
+		</dict>
+		<!-- WalletConnect Deep Linking -->
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>walletconnect</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wc</string>
+			</array>
+		</dict>
+		<!-- Custom App Deep Linking -->
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>broadcast</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>broadcast</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>

@@ -80,6 +80,18 @@ Add the following to your `android/app/src/main/AndroidManifest.xml`:
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:scheme="metamask" />
     </intent-filter>
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="wc" />
+    </intent-filter>
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="broadcast" />
+    </intent-filter>
 </activity>
 ```
 
