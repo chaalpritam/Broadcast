@@ -11,12 +11,11 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useWalletXMTP } from '../hooks';
-import WalletSelector from '../components/wallet/WalletSelector';
+import SimpleWalletConnect from '../components/wallet/SimpleWalletConnect';
 
 const WalletsScreen = () => {
     const { wallet, connectWallet, disconnectWallet, fetchBalance } = useWalletXMTP();
     const [isConnecting, setIsConnecting] = useState(false);
-    const [showWalletSelector, setShowWalletSelector] = useState(false);
     const [rewards, setRewards] = useState([
         { id: 1, type: 'Daily Login', amount: '0.001 ETH', status: 'Claimed' },
         { id: 2, type: 'First Message', amount: '0.005 ETH', status: 'Available' },
@@ -102,84 +101,8 @@ const WalletsScreen = () => {
 
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            {/* Wallet Connection Section */}
-            <View style={styles.walletSection}>
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Wallet Connection</Text>
-                    <View style={styles.statusContainer}>
-                        <View style={[styles.statusDot, { backgroundColor: getConnectionColor() }]} />
-                        <Text style={[styles.statusText, { color: getConnectionColor() }]}>
-                            {getConnectionStatus()}
-                        </Text>
-                    </View>
-                </View>
-
-                {!wallet.isConnected ? (
-                    <View style={styles.connectCard}>
-                        <Icon name="wallet-outline" size={48} color={COLORS.gray} />
-                        <Text style={styles.connectTitle}>Connect Your Wallet</Text>
-                        <Text style={styles.connectDescription}>
-                            Connect your wallet to view your balance, manage transactions, and earn rewards.
-                        </Text>
-                        <TouchableOpacity
-                            style={[styles.connectButton, { backgroundColor: isConnecting ? COLORS.gray : COLORS.primary }]}
-                            onPress={() => setShowWalletSelector(true)}
-                            disabled={isConnecting}
-                            activeOpacity={0.7}
-                        >
-                            {isConnecting ? (
-                                <ActivityIndicator size="small" color={COLORS.white} />
-                            ) : (
-                                <Icon name="wallet-outline" size={20} color={COLORS.white} />
-                            )}
-                            <Text style={styles.connectButtonText}>
-                                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <View style={styles.walletInfoCard}>
-                        <View style={styles.walletInfoHeader}>
-                            <View style={styles.statusIndicator}>
-                                <Icon name="radio-button-on" size={12} color={COLORS.success} />
-                                <Text style={styles.statusText}>Connected</Text>
-                            </View>
-                            <TouchableOpacity 
-                                style={styles.refreshButton}
-                                onPress={fetchBalance}
-                            >
-                                <Icon name="refresh-outline" size={20} color={COLORS.primary} />
-                            </TouchableOpacity>
-                        </View>
-                        
-                        {wallet.address && (
-                            <View style={styles.addressSection}>
-                                <Text style={styles.label}>Address</Text>
-                                <Text style={styles.address}>{formatAddress(wallet.address)}</Text>
-                            </View>
-                        )}
-
-                        {wallet.chainId && (
-                            <View style={styles.networkSection}>
-                                <Text style={styles.label}>Network</Text>
-                                <Text style={styles.network}>{getNetworkName(wallet.chainId)}</Text>
-                            </View>
-                        )}
-
-                        {wallet.balance && (
-                            <View style={styles.balanceSection}>
-                                <Text style={styles.label}>Balance</Text>
-                                <Text style={styles.balance}>{wallet.balance} ETH</Text>
-                            </View>
-                        )}
-
-                        <TouchableOpacity onPress={handleWalletDisconnect} style={styles.disconnectButton}>
-                            <Icon name="log-out-outline" size={20} color={COLORS.error} />
-                            <Text style={styles.disconnectText}>Disconnect</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
+            {/* Simple Wallet Connection Component */}
+            <SimpleWalletConnect />
 
             {/* Balance Section - Only show when connected */}
             {wallet.isConnected && (
@@ -227,13 +150,6 @@ const WalletsScreen = () => {
                     ))}
                 </View>
             )}
-
-            {/* Wallet Selector Modal */}
-            <WalletSelector
-                isVisible={showWalletSelector}
-                onClose={() => setShowWalletSelector(false)}
-                onWalletSelect={handleWalletConnect}
-            />
         </ScrollView>
     );
 };
@@ -244,7 +160,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
         padding: SIZES.padding,
     },
-    walletSection: {
+    balanceSection: {
         marginBottom: SIZES.padding * 2,
     },
     sectionHeader: {
@@ -256,125 +172,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         ...FONTS.h2,
         color: COLORS.black,
-    },
-    statusContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        marginRight: 8,
-    },
-    statusText: {
-        ...FONTS.body4,
-        fontWeight: '600',
-    },
-    connectCard: {
-        backgroundColor: COLORS.white,
-        borderRadius: 16,
-        padding: SIZES.padding * 2,
-        alignItems: 'center',
-        shadowColor: COLORS.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    connectTitle: {
-        ...FONTS.h3,
-        color: COLORS.black,
-        marginTop: SIZES.padding,
-        marginBottom: 8,
-    },
-    connectDescription: {
-        ...FONTS.body4,
-        color: COLORS.gray,
-        textAlign: 'center',
-        marginBottom: SIZES.padding * 1.5,
-        lineHeight: 20,
-    },
-    connectButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: COLORS.primary,
-        paddingHorizontal: SIZES.padding * 1.5,
-        paddingVertical: 12,
-        borderRadius: 12,
-        minWidth: 160,
-        justifyContent: 'center',
-    },
-    connectButtonText: {
-        ...FONTS.body3,
-        color: COLORS.white,
-        fontWeight: '600',
-        marginLeft: 8,
-    },
-    walletInfoCard: {
-        backgroundColor: COLORS.white,
-        borderRadius: 16,
-        padding: SIZES.padding * 1.5,
-        shadowColor: COLORS.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    walletInfoHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: SIZES.padding,
-    },
-    statusIndicator: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    refreshButton: {
-        padding: 8,
-    },
-    addressSection: {
-        marginBottom: 12,
-    },
-    networkSection: {
-        marginBottom: 12,
-    },
-    balanceSection: {
-        marginBottom: SIZES.padding,
-    },
-    label: {
-        ...FONTS.body4,
-        color: COLORS.gray,
-        marginBottom: 4,
-    },
-    address: {
-        ...FONTS.body3,
-        color: COLORS.black,
-        fontFamily: 'monospace',
-    },
-    network: {
-        ...FONTS.body3,
-        color: COLORS.black,
-    },
-    balance: {
-        ...FONTS.h3,
-        color: COLORS.primary,
-        fontWeight: '700',
-    },
-    disconnectButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        borderTopWidth: 1,
-        borderTopColor: COLORS.lightGray,
-        marginTop: SIZES.padding,
-    },
-    disconnectText: {
-        ...FONTS.body3,
-        color: COLORS.error,
-        marginLeft: 8,
     },
     actionButtons: {
         flexDirection: 'row',

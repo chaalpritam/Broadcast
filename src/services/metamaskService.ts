@@ -7,12 +7,16 @@ class MetaMaskService {
   private sdk: MetaMaskSDK | null = null;
   private provider: ethers.JsonRpcProvider | null = null;
   private currentWalletInfo: WalletInfo | null = null;
+  private isInitialized = false;
 
   // Initialize MetaMask SDK
   async initialize(): Promise<void> {
     try {
+      if (this.isInitialized) return;
+      
       this.sdk = new MetaMaskSDK(METAMASK_CONFIG.sdkOptions);
       await this.sdk.init();
+      this.isInitialized = true;
     } catch (error) {
       console.error('Failed to initialize MetaMask SDK:', error);
       throw new Error('Failed to initialize MetaMask');
@@ -22,8 +26,12 @@ class MetaMaskService {
   // Connect to MetaMask
   async connectWallet(): Promise<WalletInfo> {
     try {
-      if (!this.sdk) {
+      if (!this.isInitialized) {
         await this.initialize();
+      }
+
+      if (!this.sdk) {
+        throw new Error('MetaMask SDK not initialized');
       }
 
       // Request accounts from MetaMask
