@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from './index';
+import { RootState } from '../store';
 import { 
   connectWallet, 
   disconnectWallet, 
@@ -20,8 +21,8 @@ import { WalletInfo } from '../types/models';
 
 export const useWalletXMTP = () => {
   const dispatch = useAppDispatch();
-  const wallet = useAppSelector(state => state.wallet);
-  const xmtp = useAppSelector(state => state.xmtp);
+  const wallet = useAppSelector((state: RootState) => state.wallet);
+  const xmtp = useAppSelector((state: RootState) => state.xmtp);
 
   // Connect wallet with type selection
   const connectWalletHandler = useCallback(async (walletType: 'metamask' | 'walletconnect' = 'metamask') => {
@@ -120,7 +121,6 @@ export const useWalletXMTP = () => {
       return xmtpService.subscribeToMessages(peerAddress, callback);
     } catch (error: any) {
       console.error('Error subscribing to messages:', error);
-      throw error;
     }
   }, []);
 

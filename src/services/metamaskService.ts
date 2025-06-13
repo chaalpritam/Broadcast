@@ -4,37 +4,46 @@ import { WalletInfo } from '../types/models';
 import { METAMASK_CONFIG, NETWORK_MAPPING, hexToChainId } from '../config/metamask';
 
 class MetaMaskService {
-  private sdk: MetaMaskSDK | null = null;
+  private sdk: any = null; // Use any type to avoid import issues
   private provider: ethers.JsonRpcProvider | null = null;
   private currentWalletInfo: WalletInfo | null = null;
-  private isInitialized = false;
+  private accountsChangedCallback: ((accounts: string[]) => void) | null = null;
+  private chainChangedCallback: ((chainId: string) => void) | null = null;
 
   // Initialize MetaMask SDK
   async initialize(): Promise<void> {
     try {
-      if (this.isInitialized) return;
+      // Initialize MetaMask SDK - using dynamic import to avoid type issues
+      const { MetaMaskSDK } = await import('@metamask/sdk-react-native');
       
-      this.sdk = new MetaMaskSDK(METAMASK_CONFIG.sdkOptions);
-      await this.sdk.init();
-      this.isInitialized = true;
+      this.sdk = new MetaMaskSDK({
+        dappMetadata: {
+          name: 'Broadcast',
+          url: 'https://broadcast.app',
+          iconUrl: 'https://broadcast.app/icon.png',
+        },
+        logging: 'debug',
+        communicationLayerPreference: 'socket',
+        enableDebug: true,
+      });
+
+      // Set up event listeners
+      this.sdk.on('accountsChanged', this.handleAccountsChanged.bind(this));
+      this.sdk.on('chainChanged', this.handleChainChanged.bind(this));
     } catch (error) {
-      console.error('Failed to initialize MetaMask SDK:', error);
-      throw new Error('Failed to initialize MetaMask');
+      console.error('Error initializing MetaMask SDK:', error);
+      throw error;
     }
   }
 
   // Connect to MetaMask
   async connectWallet(): Promise<WalletInfo> {
     try {
-      if (!this.isInitialized) {
+      if (!this.sdk) {
         await this.initialize();
       }
 
-      if (!this.sdk) {
-        throw new Error('MetaMask SDK not initialized');
-      }
-
-      // Request accounts from MetaMask
+      // Request accounts
       const accounts = await this.sdk.connect();
       
       if (!accounts || accounts.length === 0) {
@@ -43,14 +52,12 @@ class MetaMaskService {
 
       const address = accounts[0];
       
-      // Get current chain ID
-      const chainId = await this.sdk.getChainId();
-      const chainIdNumber = hexToChainId(chainId);
+      // Get chain ID
+      const chainId = await this.sdk.chainId;
+      const chainIdNumber = parseInt(chainId, 16);
 
       // Create provider
-      this.provider = new ethers.JsonRpcProvider(
-        this.getRpcUrl(chainIdNumber)
-      );
+      this.provider = new ethers.JsonRpcProvider(this.sdk.provider);
 
       // Get balance
       const balance = await this.provider.getBalance(address);
@@ -59,8 +66,8 @@ class MetaMaskService {
       // Try to get ENS name
       let ensName: string | undefined;
       try {
-        if (chainIdNumber === 1) { // Only on Ethereum mainnet
-          ensName = await this.provider.lookupAddress(address);
+        if (chainIdNumber === 1) {
+          ensName = await this.provider.lookupAddress(address) || undefined;
         }
       } catch (error) {
         console.log('ENS lookup failed:', error);
@@ -77,7 +84,7 @@ class MetaMaskService {
       return walletInfo;
     } catch (error) {
       console.error('MetaMask connection error:', error);
-      throw new Error('Failed to connect to MetaMask. Please make sure MetaMask is installed and unlocked.');
+      throw error;
     }
   }
 
@@ -90,8 +97,8 @@ class MetaMaskService {
       this.provider = null;
       this.currentWalletInfo = null;
     } catch (error) {
-      console.error('Error disconnecting from MetaMask:', error);
-      throw new Error('Failed to disconnect from MetaMask');
+      console.error('Error disconnecting MetaMask:', error);
+      throw error;
     }
   }
 
@@ -110,7 +117,7 @@ class MetaMaskService {
       return ethers.formatEther(balance);
     } catch (error) {
       console.error('Error getting balance:', error);
-      throw new Error('Failed to get balance');
+      throw error;
     }
   }
 
@@ -118,25 +125,19 @@ class MetaMaskService {
   async switchNetwork(chainId: number): Promise<void> {
     try {
       if (!this.sdk) {
-        throw new Error('MetaMask not connected');
+        throw new Error('SDK not initialized');
       }
-
-      const hexChainId = `0x${chainId.toString(16)}`;
-      await this.sdk.switchChain(hexChainId);
-
-      // Update provider for new network
-      this.provider = new ethers.JsonRpcProvider(this.getRpcUrl(chainId));
-
-      // Update cached wallet info
+      
+      const chainIdHex = `0x${chainId.toString(16)}`;
+      await this.sdk.switchChain(chainIdHex);
+      
+      // Update current wallet info
       if (this.currentWalletInfo) {
         this.currentWalletInfo.chainId = chainId;
-        // Refresh balance
-        const balance = await this.getBalance(this.currentWalletInfo.address);
-        this.currentWalletInfo.balance = balance;
       }
     } catch (error) {
       console.error('Error switching network:', error);
-      throw new Error('Failed to switch network');
+      throw error;
     }
   }
 
@@ -144,14 +145,12 @@ class MetaMaskService {
   async signMessage(message: string): Promise<string> {
     try {
       if (!this.sdk) {
-        throw new Error('MetaMask not connected');
+        throw new Error('SDK not initialized');
       }
-
-      const signature = await this.sdk.signMessage(message);
-      return signature;
+      return await this.sdk.signMessage(message);
     } catch (error) {
       console.error('Error signing message:', error);
-      throw new Error('Failed to sign message');
+      throw error;
     }
   }
 
@@ -173,12 +172,12 @@ class MetaMaskService {
   // Get signer for XMTP integration
   async getSigner(): Promise<ethers.Signer | null> {
     try {
-      if (!this.sdk || !this.provider) {
-        return null;
+      if (!this.provider) {
+        throw new Error('Provider not initialized');
       }
-
-      // Create a signer that works with MetaMask
-      const signer = new ethers.BrowserProvider(this.provider).getSigner();
+      
+      // Create a signer using the provider
+      const signer = new ethers.BrowserProvider(this.provider as any).getSigner();
       return signer;
     } catch (error) {
       console.error('Error getting signer:', error);
@@ -188,7 +187,7 @@ class MetaMaskService {
 
   // Check if MetaMask is connected
   isConnected(): boolean {
-    return this.sdk !== null && this.currentWalletInfo !== null;
+    return this.currentWalletInfo !== null;
   }
 
   // Get current chain ID
@@ -229,22 +228,29 @@ class MetaMaskService {
 
   // Listen for account changes
   onAccountsChanged(callback: (accounts: string[]) => void): void {
-    if (this.sdk) {
-      this.sdk.on('accountsChanged', callback);
-    }
+    this.accountsChangedCallback = callback;
   }
 
   // Listen for chain changes
   onChainChanged(callback: (chainId: string) => void): void {
-    if (this.sdk) {
-      this.sdk.on('chainChanged', callback);
-    }
+    this.chainChangedCallback = callback;
   }
 
   // Remove event listeners
   removeAllListeners(): void {
-    if (this.sdk) {
-      this.sdk.removeAllListeners();
+    this.accountsChangedCallback = null;
+    this.chainChangedCallback = null;
+  }
+
+  private handleAccountsChanged(accounts: string[]): void {
+    if (this.accountsChangedCallback) {
+      this.accountsChangedCallback(accounts);
+    }
+  }
+
+  private handleChainChanged(chainId: string): void {
+    if (this.chainChangedCallback) {
+      this.chainChangedCallback(chainId);
     }
   }
 }

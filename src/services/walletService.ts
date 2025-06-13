@@ -9,7 +9,7 @@ import metamaskService from './metamaskService';
 class WalletService {
   private provider: ethers.JsonRpcProvider | null = null;
   private signer: ethers.Wallet | null = null;
-  private signClient: SignClient | null = null;
+  private signClient: any = null; // Use any to avoid type issues
   private currentWalletInfo: WalletInfo | null = null;
   private walletType: 'metamask' | 'walletconnect' | null = null;
 
@@ -101,7 +101,7 @@ class WalletService {
       let ensName: string | undefined;
       try {
         if (parseInt(chainId) === 1) {
-          ensName = await this.provider.lookupAddress(address);
+          ensName = await this.provider.lookupAddress(address) || undefined;
         }
       } catch (error) {
         console.log('ENS lookup failed:', error);
@@ -198,12 +198,12 @@ class WalletService {
         this.provider = new ethers.JsonRpcProvider(rpcUrl);
         
         if (this.signer) {
-          this.signer = new ethers.Wallet(this.signer.privateKey, this.provider);
+          this.signer = this.signer.connect(this.provider);
         }
       }
     } catch (error) {
       console.error('Error switching network:', error);
-      throw new Error('Failed to switch network');
+      throw error;
     }
   }
 
@@ -218,7 +218,7 @@ class WalletService {
       }
     } catch (error) {
       console.error('Error signing message:', error);
-      throw new Error('Failed to sign message');
+      throw error;
     }
   }
 
@@ -226,10 +226,9 @@ class WalletService {
     try {
       if (this.walletType === 'metamask') {
         return await metamaskService.getSigner();
-      } else if (this.signer) {
+      } else {
         return this.signer;
       }
-      return null;
     } catch (error) {
       console.error('Error getting signer:', error);
       return null;
@@ -237,37 +236,34 @@ class WalletService {
   }
 
   isConnected(): boolean {
-    if (this.walletType === 'metamask') {
-      return metamaskService.isConnected();
-    }
-    return this.signClient !== null && this.currentWalletInfo !== null;
+    return this.currentWalletInfo !== null;
   }
 
   getWalletType(): 'metamask' | 'walletconnect' | null {
     return this.walletType;
   }
 
+  getCurrentWalletInfo(): WalletInfo | null {
+    return this.currentWalletInfo;
+  }
+
   private handleAccountsChanged(accounts: string[]): void {
     if (accounts.length === 0) {
-      // User disconnected
       this.currentWalletInfo = null;
-    } else {
-      // Update address
-      if (this.currentWalletInfo) {
-        this.currentWalletInfo.address = accounts[0];
-      }
+    } else if (this.currentWalletInfo) {
+      this.currentWalletInfo.address = accounts[0];
     }
   }
 
   private handleChainChanged(chainId: string): void {
-    const chainIdNumber = parseInt(chainId, 16);
     if (this.currentWalletInfo) {
-      this.currentWalletInfo.chainId = chainIdNumber;
+      this.currentWalletInfo.chainId = parseInt(chainId);
     }
   }
 
   private getRpcUrl(chainId: number): string {
-    return RPC_URLS[chainId as keyof typeof RPC_URLS] || RPC_URLS[1];
+    const rpcUrls: { [key: number]: string } = RPC_URLS;
+    return rpcUrls[chainId] || rpcUrls[1]; // Default to Ethereum mainnet
   }
 }
 

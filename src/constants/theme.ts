@@ -13,12 +13,68 @@ export const COLORS = {
     error: '#FF3B30',
     success: '#34C759',
     warning: '#FFCC00',
+    lightPrimary: '#E8F5E8', // Light version of primary for backgrounds
 };
 
 export const FONTS = {
     regular: 'System',
     medium: 'System',
     bold: 'System',
+    h1: {
+        fontSize: 30,
+        fontWeight: 'bold' as const,
+        fontFamily: 'System',
+    },
+    h2: {
+        fontSize: 24,
+        fontWeight: '600' as const,
+        fontFamily: 'System',
+    },
+    h3: {
+        fontSize: 20,
+        fontWeight: '600' as const,
+        fontFamily: 'System',
+    },
+    h4: {
+        fontSize: 18,
+        fontWeight: '600' as const,
+        fontFamily: 'System',
+    },
+    h5: {
+        fontSize: 16,
+        fontWeight: '600' as const,
+        fontFamily: 'System',
+    },
+    h6: {
+        fontSize: 14,
+        fontWeight: '600' as const,
+        fontFamily: 'System',
+    },
+    body1: {
+        fontSize: 16,
+        fontWeight: 'normal' as const,
+        fontFamily: 'System',
+    },
+    body2: {
+        fontSize: 14,
+        fontWeight: 'normal' as const,
+        fontFamily: 'System',
+    },
+    body3: {
+        fontSize: 12,
+        fontWeight: 'normal' as const,
+        fontFamily: 'System',
+    },
+    body4: {
+        fontSize: 10,
+        fontWeight: 'normal' as const,
+        fontFamily: 'System',
+    },
+    caption: {
+        fontSize: 10,
+        fontWeight: 'normal' as const,
+        fontFamily: 'System',
+    },
 };
 
 export const SIZES = {
@@ -29,6 +85,7 @@ export const SIZES = {
     medium: 16,
     large: 18,
     extraLarge: 24,
+    padding: 16,
 
     // Font sizes
     h1: 30,
