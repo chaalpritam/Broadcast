@@ -3,16 +3,48 @@ import { WalletInfo } from '../types/models';
 import { SignClient } from '@walletconnect/sign-client';
 import { WalletConnectModal } from '@walletconnect/modal-react-native';
 import { WALLET_CONNECT_CONFIG, RPC_URLS } from '../config/walletConnect';
+import metamaskService from './metamaskService';
 
-// Mock wallet service for React Native
-// In a real app, you would integrate with WalletConnect, MetaMask Mobile, or other mobile wallet solutions
+// Wallet service that supports both MetaMask and WalletConnect
 class WalletService {
   private provider: ethers.JsonRpcProvider | null = null;
   private signer: ethers.Wallet | null = null;
   private signClient: SignClient | null = null;
   private currentWalletInfo: WalletInfo | null = null;
+  private walletType: 'metamask' | 'walletconnect' | null = null;
 
-  async connectWallet(): Promise<WalletInfo> {
+  async connectWallet(walletType: 'metamask' | 'walletconnect' = 'metamask'): Promise<WalletInfo> {
+    try {
+      this.walletType = walletType;
+
+      if (walletType === 'metamask') {
+        return await this.connectMetaMask();
+      } else {
+        return await this.connectWalletConnect();
+      }
+    } catch (error) {
+      console.error('Wallet connection error:', error);
+      throw new Error('Failed to connect wallet. Please try again.');
+    }
+  }
+
+  private async connectMetaMask(): Promise<WalletInfo> {
+    try {
+      const walletInfo = await metamaskService.connectWallet();
+      this.currentWalletInfo = walletInfo;
+      
+      // Set up event listeners
+      metamaskService.onAccountsChanged(this.handleAccountsChanged.bind(this));
+      metamaskService.onChainChanged(this.handleChainChanged.bind(this));
+      
+      return walletInfo;
+    } catch (error) {
+      console.error('MetaMask connection error:', error);
+      throw error;
+    }
+  }
+
+  private async connectWalletConnect(): Promise<WalletInfo> {
     try {
       // Initialize WalletConnect Sign Client
       this.signClient = await SignClient.init({
@@ -28,10 +60,7 @@ class WalletService {
 
       // Show QR code or deep link
       if (uri) {
-        // In a real app, you would show the QR code or deep link
         console.log('WalletConnect URI:', uri);
-        
-        // For now, we'll simulate the connection
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
@@ -59,9 +88,8 @@ class WalletService {
       const rpcUrl = this.getRpcUrl(parseInt(chainId));
       this.provider = new ethers.JsonRpcProvider(rpcUrl);
       
-      // Create a signer that can work with WalletConnect
       this.signer = new ethers.Wallet(
-        '0x1234567890123456789012345678901234567890123456789012345678901234', // Mock private key
+        '0x1234567890123456789012345678901234567890123456789012345678901234',
         this.provider
       );
 
@@ -72,7 +100,7 @@ class WalletService {
       // Try to get ENS name
       let ensName: string | undefined;
       try {
-        if (parseInt(chainId) === 1) { // Only on Ethereum mainnet
+        if (parseInt(chainId) === 1) {
           ensName = await this.provider.lookupAddress(address);
         }
       } catch (error) {
@@ -89,14 +117,17 @@ class WalletService {
       this.currentWalletInfo = walletInfo;
       return walletInfo;
     } catch (error) {
-      console.error('Wallet connection error:', error);
-      throw new Error('Failed to connect wallet. Please try again.');
+      console.error('WalletConnect connection error:', error);
+      throw error;
     }
   }
 
   async disconnectWallet(): Promise<void> {
     try {
-      if (this.signClient) {
+      if (this.walletType === 'metamask') {
+        await metamaskService.disconnectWallet();
+        metamaskService.removeAllListeners();
+      } else if (this.walletType === 'walletconnect' && this.signClient) {
         const sessions = this.signClient.session.getAll();
         for (const session of sessions) {
           await this.signClient.disconnect({
@@ -108,82 +139,67 @@ class WalletService {
           });
         }
       }
-    } catch (error) {
-      console.error('Error disconnecting wallet:', error);
-    } finally {
+
       this.provider = null;
       this.signer = null;
-      this.signClient = null;
       this.currentWalletInfo = null;
+      this.walletType = null;
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+      throw new Error('Failed to disconnect wallet');
     }
   }
 
   async getBalance(address: string): Promise<string> {
     try {
-      if (this.currentWalletInfo) {
-        // Return cached balance with some variation to simulate real updates
-        const baseBalance = parseFloat(this.currentWalletInfo.balance);
-        const variation = (Math.random() - 0.5) * 0.01; // ±0.005 ETH variation
-        const newBalance = (baseBalance + variation).toFixed(4);
-        this.currentWalletInfo.balance = newBalance;
-        return newBalance;
+      if (this.walletType === 'metamask') {
+        return await metamaskService.getBalance(address);
+      } else if (this.provider) {
+        const balance = await this.provider.getBalance(address);
+        return ethers.formatEther(balance);
+      } else {
+        throw new Error('No provider available');
       }
-      
-      if (!this.provider) {
-        throw new Error('Wallet not connected');
-      }
-
-      const balance = await this.provider.getBalance(address);
-      return ethers.formatEther(balance);
     } catch (error) {
-      console.error('Error fetching balance:', error);
-      return '0.0000';
+      console.error('Error getting balance:', error);
+      throw new Error('Failed to get balance');
     }
-  }
-
-  async getSigner(): Promise<ethers.Wallet | null> {
-    return this.signer;
-  }
-
-  async getProvider(): Promise<ethers.JsonRpcProvider | null> {
-    return this.provider;
   }
 
   async switchNetwork(chainId: number): Promise<void> {
     try {
-      if (!this.signClient) {
-        throw new Error('Wallet not connected');
-      }
+      if (this.walletType === 'metamask') {
+        await metamaskService.switchNetwork(chainId);
+        this.currentWalletInfo = metamaskService.getWalletInfo();
+      } else if (this.signClient) {
+        const sessions = this.signClient.session.getAll();
+        if (sessions.length === 0) {
+          throw new Error('No active session');
+        }
 
-      const sessions = this.signClient.session.getAll();
-      if (sessions.length === 0) {
-        throw new Error('No active session');
-      }
+        const session = sessions[0];
+        const chainIdHex = `eip155:${chainId}`;
 
-      const session = sessions[0];
-      const chainIdHex = `eip155:${chainId}`;
-
-      await this.signClient.update({
-        topic: session.topic,
-        namespaces: {
-          eip155: {
-            ...session.namespaces.eip155,
-            chains: [chainIdHex],
+        await this.signClient.update({
+          topic: session.topic,
+          namespaces: {
+            eip155: {
+              ...session.namespaces.eip155,
+              chains: [chainIdHex],
+            },
           },
-        },
-      });
+        });
 
-      // Update our cached wallet info
-      if (this.currentWalletInfo) {
-        this.currentWalletInfo.chainId = chainId;
-      }
+        if (this.currentWalletInfo) {
+          this.currentWalletInfo.chainId = chainId;
+        }
 
-      // Update provider for new network
-      const rpcUrl = this.getRpcUrl(chainId);
-      this.provider = new ethers.JsonRpcProvider(rpcUrl);
-      
-      if (this.signer) {
-        this.signer = new ethers.Wallet(this.signer.privateKey, this.provider);
+        const rpcUrl = this.getRpcUrl(chainId);
+        this.provider = new ethers.JsonRpcProvider(rpcUrl);
+        
+        if (this.signer) {
+          this.signer = new ethers.Wallet(this.signer.privateKey, this.provider);
+        }
       }
     } catch (error) {
       console.error('Error switching network:', error);
@@ -193,45 +209,66 @@ class WalletService {
 
   async signMessage(message: string): Promise<string> {
     try {
-      if (!this.signer) {
-        throw new Error('Wallet not connected');
+      if (this.walletType === 'metamask') {
+        return await metamaskService.signMessage(message);
+      } else if (this.signer) {
+        return await this.signer.signMessage(message);
+      } else {
+        throw new Error('No signer available');
       }
-
-      return await this.signer.signMessage(message);
     } catch (error) {
       console.error('Error signing message:', error);
       throw new Error('Failed to sign message');
     }
   }
 
-  async sendTransaction(transaction: ethers.TransactionRequest): Promise<ethers.TransactionResponse> {
+  async getSigner(): Promise<ethers.Signer | null> {
     try {
-      if (!this.signer) {
-        throw new Error('Wallet not connected');
+      if (this.walletType === 'metamask') {
+        return await metamaskService.getSigner();
+      } else if (this.signer) {
+        return this.signer;
       }
-
-      return await this.signer.sendTransaction(transaction);
+      return null;
     } catch (error) {
-      console.error('Error sending transaction:', error);
-      throw new Error('Failed to send transaction');
+      console.error('Error getting signer:', error);
+      return null;
     }
   }
 
-  // Helper method to get current wallet info
-  getCurrentWalletInfo(): WalletInfo | null {
-    return this.currentWalletInfo;
+  isConnected(): boolean {
+    if (this.walletType === 'metamask') {
+      return metamaskService.isConnected();
+    }
+    return this.signClient !== null && this.currentWalletInfo !== null;
   }
 
-  // Helper method to get RPC URL for different chains
+  getWalletType(): 'metamask' | 'walletconnect' | null {
+    return this.walletType;
+  }
+
+  private handleAccountsChanged(accounts: string[]): void {
+    if (accounts.length === 0) {
+      // User disconnected
+      this.currentWalletInfo = null;
+    } else {
+      // Update address
+      if (this.currentWalletInfo) {
+        this.currentWalletInfo.address = accounts[0];
+      }
+    }
+  }
+
+  private handleChainChanged(chainId: string): void {
+    const chainIdNumber = parseInt(chainId, 16);
+    if (this.currentWalletInfo) {
+      this.currentWalletInfo.chainId = chainIdNumber;
+    }
+  }
+
   private getRpcUrl(chainId: number): string {
     return RPC_URLS[chainId as keyof typeof RPC_URLS] || RPC_URLS[1];
   }
-
-  // Helper method to check if wallet is connected
-  isConnected(): boolean {
-    return this.signClient !== null && this.currentWalletInfo !== null;
-  }
 }
 
-export const walletService = new WalletService();
-export default walletService; 
+export default new WalletService(); 

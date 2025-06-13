@@ -23,11 +23,11 @@ export const useWalletXMTP = () => {
   const wallet = useAppSelector(state => state.wallet);
   const xmtp = useAppSelector(state => state.xmtp);
 
-  // Connect wallet
-  const connectWalletHandler = useCallback(async () => {
+  // Connect wallet with type selection
+  const connectWalletHandler = useCallback(async (walletType: 'metamask' | 'walletconnect' = 'metamask') => {
     try {
       dispatch(setWalletError(''));
-      const walletInfo = await walletService.connectWallet();
+      const walletInfo = await walletService.connectWallet(walletType);
       dispatch(setWalletInfo(walletInfo));
       return walletInfo;
     } catch (error: any) {
@@ -104,30 +104,30 @@ export const useWalletXMTP = () => {
     }
   }, []);
 
-  // Get XMTP messages
-  const getMessages = useCallback(async (peerAddress: string, limit?: number) => {
+  // Get messages for a conversation
+  const getMessages = useCallback(async (peerAddress: string) => {
     try {
-      return await xmtpService.getMessages(peerAddress, limit);
+      return await xmtpService.getMessages(peerAddress);
     } catch (error: any) {
       console.error('Error getting messages:', error);
       throw error;
     }
   }, []);
 
-  // Subscribe to XMTP messages
-  const subscribeToMessages = useCallback(async (peerAddress: string, callback: (message: any) => void) => {
+  // Subscribe to new messages
+  const subscribeToMessages = useCallback((peerAddress: string, callback: (message: any) => void) => {
     try {
-      await xmtpService.subscribeToMessages(peerAddress, callback);
+      return xmtpService.subscribeToMessages(peerAddress, callback);
     } catch (error: any) {
       console.error('Error subscribing to messages:', error);
       throw error;
     }
   }, []);
 
-  // Check if can message
-  const canMessage = useCallback(async (peerAddress: string) => {
+  // Check if can message an address
+  const canMessage = useCallback(async (address: string) => {
     try {
-      return await xmtpService.canMessage(peerAddress);
+      return await xmtpService.canMessage(address);
     } catch (error: any) {
       console.error('Error checking if can message:', error);
       return false;
@@ -138,11 +138,16 @@ export const useWalletXMTP = () => {
   const switchNetwork = useCallback(async (chainId: number) => {
     try {
       await walletService.switchNetwork(chainId);
+      // Update wallet info after network switch
+      const currentWalletInfo = walletService.getCurrentWalletInfo();
+      if (currentWalletInfo) {
+        dispatch(setWalletInfo(currentWalletInfo));
+      }
     } catch (error: any) {
       console.error('Error switching network:', error);
       throw error;
     }
-  }, []);
+  }, [dispatch]);
 
   // Sign message
   const signMessage = useCallback(async (message: string) => {
@@ -152,6 +157,11 @@ export const useWalletXMTP = () => {
       console.error('Error signing message:', error);
       throw error;
     }
+  }, []);
+
+  // Get wallet type
+  const getWalletType = useCallback(() => {
+    return walletService.getWalletType();
   }, []);
 
   return {
@@ -186,5 +196,6 @@ export const useWalletXMTP = () => {
     canMessage,
     switchNetwork,
     signMessage,
+    getWalletType,
   };
 }; 
